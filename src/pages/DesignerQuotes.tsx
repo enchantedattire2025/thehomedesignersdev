@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, Users, Calendar, Star, TrendingUp, Clock, CheckCircle, AlertCircle, Eye, MessageSquare, Award, Target, Activity, FileText, X, XCircle, BarChart as BarChartIcon, PieChart as PieChartIcon, LineChart as LineChartIcon, ArrowLeft, Filter, Search, CreditCard as Edit, Trash2, Send, Plus, ThumbsDown, Download } from 'lucide-react';
+import { BarChart3, Users, Calendar, Star, TrendingUp, Clock, CheckCircle, AlertCircle, Eye, MessageSquare, Award, Target, Activity, FileText, X, XCircle, BarChart as BarChartIcon, PieChart as PieChartIcon, LineChart as LineChartIcon, ArrowLeft, Filter, Search, CreditCard as Edit, Trash2, Send, Plus, ThumbsDown, Download, Mail, Phone } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useDesignerProfile } from '../hooks/useDesignerProfile';
 import { supabase } from '../lib/supabase';
@@ -29,6 +29,7 @@ interface Quote {
     project_name: string;
     name: string; // customer name
     email: string;
+    phone: string;
     property_type: string;
   };
   items_count: { count: number };
@@ -74,7 +75,7 @@ const DesignerQuotes = () => {
         .from('designer_quotes')
         .select(`
           *,
-          project:customers(project_name, name, email, property_type),
+          project:customers(project_name, name, email, phone, property_type),
           items_count:quote_items(count)
         `)
         .eq('designer_id', designer.id)
@@ -474,6 +475,36 @@ const DesignerQuotes = () => {
             </div>
           </div>
         </div>
+
+        {selectedQuote.status === 'accepted' && selectedQuote.project && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-5">
+            <h4 className="font-semibold text-green-800 mb-3 flex items-center space-x-2">
+              <CheckCircle className="w-5 h-5" />
+              <span>Customer Contact Details</span>
+            </h4>
+            <p className="text-sm text-green-700 mb-3">Quote accepted - you can now contact the customer directly.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3 bg-white rounded-lg p-3 border border-green-100">
+                <Mail className="w-5 h-5 text-green-600" />
+                <div>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <a href={`mailto:${selectedQuote.project.email}`} className="text-sm font-medium text-green-700 hover:underline">
+                    {selectedQuote.project.email}
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 bg-white rounded-lg p-3 border border-green-100">
+                <Phone className="w-5 h-5 text-green-600" />
+                <div>
+                  <p className="text-xs text-gray-500">Phone</p>
+                  <a href={`tel:${selectedQuote.project.phone}`} className="text-sm font-medium text-green-700 hover:underline">
+                    {selectedQuote.project.phone}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {selectedQuote.design_image_url && (
           <div className="mb-6">
