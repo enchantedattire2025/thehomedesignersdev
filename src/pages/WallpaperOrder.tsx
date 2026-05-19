@@ -468,9 +468,15 @@ export default function WallpaperOrder() {
 
             {selectedWallpaper && (
               <div className="mb-6 bg-gradient-to-r from-blue-50 to-slate-50 border-2 border-blue-200 rounded-xl p-5">
-               
+                <h3 className="text-sm font-semibold text-blue-900 mb-3 uppercase tracking-wide">Selected Wallpaper</h3>
                 <div className="flex gap-4 items-start">
-
+                  <div className="flex-shrink-0">
+                    <img
+                      src={selectedWallpaper.image_url}
+                      alt={selectedWallpaper.title}
+                      className="w-32 h-40 object-cover rounded-lg shadow-md border-2 border-white"
+                    />
+                  </div>
                   <div className="flex-1">
                     <h4 className="text-lg font-bold text-gray-900 mb-2">{selectedWallpaper.title}</h4>
                     <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full mb-2">
