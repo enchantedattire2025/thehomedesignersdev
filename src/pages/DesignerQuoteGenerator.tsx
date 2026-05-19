@@ -176,7 +176,7 @@ const DesignerQuoteGenerator = () => {
     description: '',
     quote_number: `QT-${Date.now().toString().slice(-6)}`,
     valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-    terms_and_conditions: 'This quote is valid for 30 days from the date of issue. A 50% advance payment is required to begin work. The remaining balance is due upon completion. Any changes to the scope of work may result in additional charges.',
+    terms_and_conditions: 'This quote is valid for 30 days from the date of issue. A 10% advance payment is required to begin work. The remaining balance is due upon completion. Any changes to the scope of work may result in additional charges.',
     notes: '',
     subtotal: 0,
     discount_amount: 0,
