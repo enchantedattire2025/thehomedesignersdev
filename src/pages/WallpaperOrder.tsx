@@ -434,6 +434,7 @@ export default function WallpaperOrder() {
               <li>50% advance payment required via PayPal</li>
               <li>Preview will be provided before final confirmation</li>
               <li>Delivery and execution at site after confirmation</li>
+              <li>Installation within 2 days</li>
             </ul>
           </div>
 
