@@ -143,15 +143,12 @@ export default function WallpaperOrder() {
       },
       createOrder: (_data: any, actions: any) => {
         const { advance: currentAdvance } = calculateTotal();
-        // Using USD for sandbox; PayPal sandbox doesn't support INR
-        // Convert INR to USD at approximate rate for testing (1 USD = 83 INR)
-        const amountUSD = (currentAdvance / 83).toFixed(2);
         return actions.order.create({
           purchase_units: [{
-            description: '3D Wallpaper Order - Advance Payment (INR ' + currentAdvance.toFixed(2) + ')',
+            description: '3D Wallpaper Order - Advance Payment',
             amount: {
-              currency_code: 'USD',
-              value: amountUSD
+              currency_code: 'INR',
+              value: currentAdvance.toFixed(2)
             }
           }]
         });
