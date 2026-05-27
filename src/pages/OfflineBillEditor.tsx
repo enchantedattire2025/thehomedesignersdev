@@ -83,6 +83,28 @@ interface BillVersion {
 const ITEM_TYPES = ['material', 'labor', 'service', 'component', 'other'];
 const UNITS = ['sq.ft', 'sq.m', 'per meter', 'hours', 'piece', 'lump sum', 'kg', 'litre', 'nos'];
 
+const DRAFT_KEY = 'offline_bill_draft';
+
+const defaultItem = (): BillItem => ({
+  item_type: 'material',
+  name: '',
+  description: '',
+  number_of_units: 1,
+  quantity: 0,
+  unit: 'sq.ft',
+  unit_price: 0,
+  discount_percent: 0,
+  amount: 0,
+});
+
+function loadDraft() {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+
 const OfflineBillEditor = () => {
   const navigate = useNavigate();
   const { billId } = useParams<{ billId: string }>();
@@ -90,29 +112,21 @@ const OfflineBillEditor = () => {
   const { user } = useAuth();
   const { designer } = useDesignerProfile();
 
+  const draft = !isEditMode ? loadDraft() : null;
+
   // Customer info
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [customerAddress, setCustomerAddress] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
+  const [customerName, setCustomerName] = useState(draft?.customerName ?? '');
+  const [customerEmail, setCustomerEmail] = useState(draft?.customerEmail ?? '');
+  const [customerPhone, setCustomerPhone] = useState(draft?.customerPhone ?? '');
+  const [customerAddress, setCustomerAddress] = useState(draft?.customerAddress ?? '');
+  const [projectDescription, setProjectDescription] = useState(draft?.projectDescription ?? '');
 
   // Bill state
   const [bill, setBill] = useState<OfflineBill | null>(null);
-  const [items, setItems] = useState<BillItem[]>([{
-    item_type: 'material',
-    name: '',
-    description: '',
-    number_of_units: 1,
-    quantity: 0,
-    unit: 'sq.ft',
-    unit_price: 0,
-    discount_percent: 0,
-    amount: 0,
-  }]);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [taxRate, setTaxRate] = useState(18);
-  const [notes, setNotes] = useState('');
+  const [items, setItems] = useState<BillItem[]>(draft?.items ?? [defaultItem()]);
+  const [discountAmount, setDiscountAmount] = useState<number>(draft?.discountAmount ?? 0);
+  const [taxRate, setTaxRate] = useState<number>(draft?.taxRate ?? 18);
+  const [notes, setNotes] = useState(draft?.notes ?? '');
 
   // UI state
   const [loading, setLoading] = useState(isEditMode);
@@ -131,6 +145,13 @@ const OfflineBillEditor = () => {
       fetchBillData(billId);
     }
   }, [isEditMode, user, designer, billId]);
+
+  // Persist draft to sessionStorage on every change (create mode only)
+  useEffect(() => {
+    if (isEditMode) return;
+    const draft = { customerName, customerEmail, customerPhone, customerAddress, projectDescription, items, discountAmount, taxRate, notes };
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  }, [isEditMode, customerName, customerEmail, customerPhone, customerAddress, projectDescription, items, discountAmount, taxRate, notes]);
 
   const fetchBillData = async (id: string) => {
     try {
@@ -375,6 +396,7 @@ const OfflineBillEditor = () => {
           if (itemsError) throw itemsError;
         }
 
+        sessionStorage.removeItem(DRAFT_KEY);
         setSuccess('Bill created successfully!');
         setTimeout(() => navigate(`/offline-bill/${newBill?.id}`, { replace: true }), 1200);
         return;
@@ -981,3 +1003,6 @@ const OfflineBillEditor = () => {
 };
 
 export default OfflineBillEditor;
+
+
+export default OfflineBillEditor
