@@ -49,6 +49,8 @@ import AdminAuthDebug from './pages/AdminAuthDebug';
 import My3DWallpaperOrders from './pages/My3DWallpaperOrders';
 import DesignerBilling from './pages/DesignerBilling';
 import CustomerBillView from './pages/CustomerBillView';
+import BillDashboard from './pages/BillDashboard';
+import OfflineBillEditor from './pages/OfflineBillEditor';
 import { forceLogoutAll } from './utils/clearAuth';
 import { debugAuthState } from './utils/debugDesigner';
 
@@ -167,6 +169,9 @@ function App() {
             <Route path="/my-3d-wallpaper-orders" element={<My3DWallpaperOrders />} />
             <Route path="/project-bill/:projectId" element={<ProtectedDesignerRoute><DesignerBilling /></ProtectedDesignerRoute>} />
             <Route path="/my-bill/:projectId" element={<CustomerBillView />} />
+            <Route path="/bills" element={<ProtectedDesignerRoute><BillDashboard /></ProtectedDesignerRoute>} />
+            <Route path="/create-offline-bill" element={<ProtectedDesignerRoute><OfflineBillEditor /></ProtectedDesignerRoute>} />
+            <Route path="/offline-bill/:billId" element={<ProtectedDesignerRoute><OfflineBillEditor /></ProtectedDesignerRoute>} />
             <Route path="/auth/confirm" element={<EmailConfirmation />} />
           </Routes>
         </main>

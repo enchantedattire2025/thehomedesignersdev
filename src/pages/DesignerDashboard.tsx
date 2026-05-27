@@ -21,7 +21,8 @@ import {
   PieChart as PieChartIcon,
   LineChart as LineChartIcon,
   Box,
-  User
+  User,
+  Receipt
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -1108,6 +1109,13 @@ const DesignerDashboard = () => {
                 >
                   <FileText className="w-5 h-5 text-primary-600" />
                   <span className="font-medium text-gray-700">Manage Quotes</span>
+                </button>
+                <button
+                  onClick={() => navigate('/bills')}
+                  className="w-full text-left p-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center space-x-3"
+                >
+                  <Receipt className="w-5 h-5 text-primary-600" />
+                  <span className="font-medium text-gray-700">Bills Dashboard</span>
                 </button>
               </div>
 
