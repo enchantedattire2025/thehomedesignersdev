@@ -1003,6 +1003,3 @@ const OfflineBillEditor = () => {
 };
 
 export default OfflineBillEditor;
-
-
-export default OfflineBillEditor
