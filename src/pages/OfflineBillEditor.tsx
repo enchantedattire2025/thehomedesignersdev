@@ -19,6 +19,7 @@ import {
   Receipt,
   History,
   ChevronDown,
+  ChevronUp,
   Eye,
   Download,
   UserCheck,
@@ -297,6 +298,14 @@ const OfflineBillEditor = () => {
     setItems(items.filter((_, i) => i !== index));
   };
 
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= items.length) return;
+    const updated = [...items];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    setItems(updated);
+  };
+
   const validateForm = () => {
     if (!customerName.trim()) return 'Customer name is required';
     if (!customerPhone.trim()) return 'Customer phone is required';
@@ -494,7 +503,7 @@ const OfflineBillEditor = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-screen-2xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -745,28 +754,52 @@ const OfflineBillEditor = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" style={{ minWidth: '1100px' }}>
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium w-8">#</th>
-                  <th className="text-left px-4 py-3 font-medium">Type</th>
-                  <th className="text-left px-4 py-3 font-medium min-w-[180px]">Name / Description</th>
-                  <th className="text-left px-4 py-3 font-medium">Units</th>
-                  <th className="text-left px-4 py-3 font-medium">Src Unit</th>
-                  <th className="text-left px-4 py-3 font-medium">L</th>
-                  <th className="text-left px-4 py-3 font-medium">B</th>
-                  <th className="text-left px-4 py-3 font-medium">Qty</th>
-                  <th className="text-left px-4 py-3 font-medium">Tgt Unit</th>
-                  <th className="text-left px-4 py-3 font-medium">Rate</th>
-                  <th className="text-right px-4 py-3 font-medium">Amount</th>
-                  {!viewingVersion && <th className="w-10"></th>}
+                  <th className="text-left px-3 py-3 font-medium w-8">#</th>
+                  {!viewingVersion && <th className="px-2 py-3 font-medium w-16 text-center">Order</th>}
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '110px' }}>Type</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '200px' }}>Name / Description</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '70px' }}>Units</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '90px' }}>Src Unit</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '70px' }}>L</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '70px' }}>B</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '90px' }}>Qty</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '110px' }}>Tgt Unit</th>
+                  <th className="text-left px-3 py-3 font-medium" style={{ minWidth: '90px' }}>Rate</th>
+                  <th className="text-right px-3 py-3 font-medium" style={{ minWidth: '100px' }}>Amount</th>
+                  {!viewingVersion && <th className="w-10 px-2 py-3"></th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {displayItems.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50/50">
-                    <td className="px-4 py-2 text-gray-400">{index + 1}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2 text-gray-400 text-xs">{index + 1}</td>
+                    {/* Move up/down */}
+                    {!viewingVersion && (
+                      <td className="px-2 py-2 text-center">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <button
+                            onClick={() => moveItem(index, 'up')}
+                            disabled={index === 0}
+                            className="p-0.5 text-gray-400 hover:text-gray-700 disabled:opacity-20 disabled:cursor-not-allowed rounded hover:bg-gray-100 transition-colors"
+                            title="Move up"
+                          >
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => moveItem(index, 'down')}
+                            disabled={index === items.length - 1}
+                            className="p-0.5 text-gray-400 hover:text-gray-700 disabled:opacity-20 disabled:cursor-not-allowed rounded hover:bg-gray-100 transition-colors"
+                            title="Move down"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 capitalize">{item.item_type}</span>
                       ) : (
@@ -779,7 +812,7 @@ const OfflineBillEditor = () => {
                         </select>
                       )}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <div>
                           <p className="text-sm text-gray-800 font-medium">{item.name}</p>
@@ -805,7 +838,7 @@ const OfflineBillEditor = () => {
                       )}
                     </td>
                     {/* Units (count) */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-sm text-gray-700">{item.number_of_units}</span>
                       ) : (
@@ -813,12 +846,12 @@ const OfflineBillEditor = () => {
                           type="number"
                           value={item.number_of_units || ''}
                           onChange={(e) => handleItemChange(index, 'number_of_units', parseFloat(e.target.value) || 0)}
-                          className="w-16 px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                         />
                       )}
                     </td>
                     {/* Source Unit */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-xs text-gray-600">{item.source_unit || '—'}</span>
                       ) : (
@@ -832,7 +865,7 @@ const OfflineBillEditor = () => {
                       )}
                     </td>
                     {/* Length */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-sm text-gray-700">{item.length || '—'}</span>
                       ) : (
@@ -841,12 +874,12 @@ const OfflineBillEditor = () => {
                           value={item.length || ''}
                           onChange={(e) => handleItemChange(index, 'length', parseFloat(e.target.value) || 0)}
                           placeholder="—"
-                          className="w-16 px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                         />
                       )}
                     </td>
                     {/* Breadth */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-sm text-gray-700">{item.breadth || '—'}</span>
                       ) : (
@@ -855,12 +888,12 @@ const OfflineBillEditor = () => {
                           value={item.breadth || ''}
                           onChange={(e) => handleItemChange(index, 'breadth', parseFloat(e.target.value) || 0)}
                           placeholder="—"
-                          className="w-16 px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                         />
                       )}
                     </td>
                     {/* Qty (auto-calculated from L × B with unit conversion) */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-sm text-gray-700">{item.quantity != null ? Number(item.quantity).toFixed(3) : '—'}</span>
                       ) : (() => {
@@ -873,7 +906,7 @@ const OfflineBillEditor = () => {
                               value={item.quantity != null && item.quantity !== 0 ? parseFloat(Number(item.quantity).toFixed(6)) : ''}
                               onChange={(e) => !isAutoCalc && handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
                               readOnly={isAutoCalc}
-                              className={`w-24 px-2 py-1.5 border rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500 ${isAutoCalc ? 'bg-teal-50 border-teal-200 text-teal-800 font-medium cursor-default' : 'border-gray-200 bg-white'}`}
+                              className={`w-full px-2 py-1.5 border rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500 ${isAutoCalc ? 'bg-teal-50 border-teal-200 text-teal-800 font-medium cursor-default' : 'border-gray-200 bg-white'}`}
                               title={isAutoCalc ? `Auto: ${item.length}×${item.breadth ?? 1} ${item.source_unit} → ${item.target_unit}` : 'Enter quantity manually'}
                             />
                           </div>
@@ -881,7 +914,7 @@ const OfflineBillEditor = () => {
                       })()}
                     </td>
                     {/* Target Unit */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-xs text-gray-600">{item.target_unit || item.unit}</span>
                       ) : (
@@ -896,7 +929,7 @@ const OfflineBillEditor = () => {
                       )}
                     </td>
                     {/* Rate */}
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       {viewingVersion ? (
                         <span className="text-sm text-gray-700">{item.unit_price}</span>
                       ) : (
@@ -904,15 +937,15 @@ const OfflineBillEditor = () => {
                           type="number"
                           value={item.unit_price || ''}
                           onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                          className="w-20 px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                         />
                       )}
                     </td>
-                    <td className="px-4 py-2 text-right font-medium text-gray-800">
+                    <td className="px-3 py-2 text-right font-medium text-gray-800 whitespace-nowrap">
                       {(item.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </td>
                     {!viewingVersion && (
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-2 py-2 text-center">
                         <button
                           onClick={() => removeItem(index)}
                           className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -925,7 +958,7 @@ const OfflineBillEditor = () => {
                 ))}
                 {displayItems.length === 0 && (
                   <tr>
-                    <td colSpan={viewingVersion ? 12 : 13} className="px-4 py-8 text-center text-gray-400">
+                    <td colSpan={viewingVersion ? 11 : 13} className="px-4 py-8 text-center text-gray-400">
                       No items. Click "Add Item" to start.
                     </td>
                   </tr>
