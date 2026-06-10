@@ -166,6 +166,11 @@ export function parseVoiceItemCommand(rawTranscript: string): ParsedVoiceItem {
     text = qtyResult.restText;
   }
 
+  // If dimensions were extracted but no explicit quantity, auto-calculate from area (width × height)
+  if (width !== null && height !== null && quantity === null) {
+    quantity = parseFloat((width * height).toFixed(4));
+  }
+
   // Step 5: whatever text remains is the item name
   const name = cleanName(text);
 
