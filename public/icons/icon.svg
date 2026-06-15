@@ -1,13 +1,4 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" fill="url(#grad)"/>
-  <path d="M 256 128 L 102 256 L 410 256 Z" fill="white"/>
-  <rect x="128" y="256" width="256" height="179" fill="white"/>
-  <rect x="215" y="318" width="82" height="117" fill="#4F46E5"/>
-  <rect x="318" y="297" width="61" height="61" fill="#4F46E5"/>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="512" height="512" fill="#ffffff" rx="80"/>
+  <image href="/thehomedesigners.png" x="56" y="56" width="400" height="400" preserveAspectRatio="xMidYMid meet"/>
 </svg>
