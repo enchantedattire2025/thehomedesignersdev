@@ -293,9 +293,9 @@ const OfflineBillEditor = () => {
   };
 
   const calculateItemAmount = (item: BillItem): number => {
-    const units = item.number_of_units || 1;
-    const qty = item.quantity || 0;
-    const price = item.unit_price || 0;
+    const units = item.number_of_units ?? 1;
+    const qty = item.quantity ?? 0;
+    const price = item.unit_price ?? 0;
     return units * qty * price;
   };
 
@@ -917,8 +917,10 @@ const OfflineBillEditor = () => {
                       ) : (
                         <input
                           type="number"
-                          value={item.number_of_units || ''}
-                          onChange={(e) => handleItemChange(index, 'number_of_units', parseFloat(e.target.value) || 0)}
+                          value={item.number_of_units ?? ''}
+                          onChange={(e) => handleItemChange(index, 'number_of_units', Math.max(1, parseFloat(e.target.value) || 1))}
+                          min="1"
+                          step="1"
                           className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                         />
                       )}
