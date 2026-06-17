@@ -1,0 +1,1 @@
+ALTER TABLE designers ADD COLUMN IF NOT EXISTS instagram_url text;

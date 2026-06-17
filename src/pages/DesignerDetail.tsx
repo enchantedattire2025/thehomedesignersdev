@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Star, MapPin, Calendar, Award, Phone, Mail, ArrowLeft, ExternalLink, User, Navigation } from 'lucide-react';
+import { FaInstagram } from 'react-icons/fa';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import AuthModal from '../components/AuthModal';
@@ -439,6 +440,17 @@ const DesignerDetail = () => {
                         <ExternalLink className="w-5 h-5" />
                         <span>{designer.website}</span>
                       </button>
+                    )}
+                    {designer.instagram_url && (
+                      <a
+                        href={designer.instagram_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-3 text-gray-600 hover:text-pink-500 transition-colors w-full text-left"
+                      >
+                        <FaInstagram style={{ width: '20px', height: '20px' }} />
+                        <span>Instagram Portfolio</span>
+                      </a>
                     )}
                     {designer.google_location_url && (
                       <button

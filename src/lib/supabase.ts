@@ -141,6 +141,7 @@ export type Designer = {
   is_active: boolean;
   business_type?: 'google_location' | 'virtual';
   google_location_url?: string;
+  instagram_url?: string;
   created_at: string;
   updated_at: string;
 };

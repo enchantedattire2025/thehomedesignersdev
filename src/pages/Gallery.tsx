@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, ZoomIn, Heart, Share2, Calendar, MapPin, User, Plus, Search } from 'lucide-react';
+import { X, ZoomIn, Heart, Share2, Calendar, MapPin, User, Plus, Search, ExternalLink } from 'lucide-react';
+import { FaInstagram } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -18,6 +19,7 @@ interface GalleryItem {
   materials?: string[];
   projectId?: string;
   is_approved?: boolean;
+  instagramUrl?: string;
 }
 
 const Gallery = () => {
@@ -59,7 +61,8 @@ const Gallery = () => {
           is_approved,
           designers!inner (
             id,
-            name
+            name,
+            instagram_url
           )
         `)
         .eq('is_approved', true)
@@ -79,7 +82,8 @@ const Gallery = () => {
         image: item.image_url,
         description: item.description,
         materials: item.materials || [],
-        is_approved: item.is_approved
+        is_approved: item.is_approved,
+        instagramUrl: item.designers?.instagram_url || ''
       }));
 
       setAllGalleryItems(galleryItems);
@@ -213,7 +217,7 @@ const Gallery = () => {
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
-            <div 
+            <div
               key={item.id}
               className="group relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" // [cite: 40]
               onClick={() => setSelectedImage(item)}
@@ -232,6 +236,20 @@ const Gallery = () => {
                     {item.category}
                   </span>
                 </div>
+                {item.instagramUrl && (
+                  <div className="absolute bottom-3 right-3">
+                    <a
+                      href={item.instagramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white shadow-md hover:scale-110 transition-transform"
+                      title="View Instagram Portfolio"
+                    >
+                      <FaInstagram className="w-4 h-4" style={{ width: '16px', height: '16px' }} />
+                    </a>
+                  </div>
+                )}
               </div>
               
               <div className="p-4">
@@ -335,6 +353,42 @@ const Gallery = () => {
                         </span>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {selectedImage.instagramUrl && (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-secondary-800 flex items-center space-x-2">
+                        <FaInstagram className="text-pink-500" style={{ width: '18px', height: '18px' }} />
+                        <span>Instagram Portfolio</span>
+                      </h3>
+                      <a
+                        href={selectedImage.instagramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-1 text-xs text-pink-500 hover:text-pink-600 font-medium"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Open</span>
+                      </a>
+                    </div>
+                    <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-50" style={{ height: '380px' }}>
+                      <iframe
+                        src={`${selectedImage.instagramUrl.replace(/\/$/, '')}/embed/`}
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        scrolling="no"
+                        allowTransparency
+                        allow="encrypted-media"
+                        className="block"
+                        title={`${selectedImage.designer} Instagram`}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2 text-center">
+                      Instagram embed may require you to be logged in to Instagram
+                    </p>
                   </div>
                 )}
 

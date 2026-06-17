@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Phone, MapPin, Briefcase, Globe, IndianRupee, FileText, Award, Plus, X, Upload, ArrowLeft, Save, AlertCircle, Lock, Eye, EyeOff, Building2, Wifi } from 'lucide-react';
+import { FaInstagram } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useDesignerProfile } from '../hooks/useDesignerProfile';
 import { supabase } from '../lib/supabase';
@@ -41,6 +42,7 @@ const DesignerRegistration = () => {
     profile_image: '',
     business_type: '' as '' | 'google_location' | 'virtual',
     google_location_url: '',
+    instagram_url: '',
     services: [''],
     materials_expertise: [''],
     awards: ['']
@@ -97,6 +99,7 @@ const DesignerRegistration = () => {
           profile_image: designer.profile_image || '',
           business_type: (designer.business_type as '' | 'google_location' | 'virtual') || '',
           google_location_url: designer.google_location_url || '',
+          instagram_url: designer.instagram_url || '',
           services: designer.services && designer.services.length > 0 ? designer.services : [''],
           materials_expertise: designer.materials_expertise && designer.materials_expertise.length > 0 ? designer.materials_expertise : [''],
           awards: designer.awards && designer.awards.length > 0 ? designer.awards : ['']
@@ -441,6 +444,7 @@ const DesignerRegistration = () => {
         bio: formData.bio.trim(),
         website: formData.website.trim(),
         starting_price: formData.starting_price.trim(),
+        instagram_url: formData.instagram_url.trim(),
         profile_image: profileImageUrl,
         business_type: formData.business_type || null,
         google_location_url: formData.business_type === 'google_location' ? formData.google_location_url.trim() : null,
@@ -508,6 +512,7 @@ const DesignerRegistration = () => {
             bio: cleanedData.bio,
             website: cleanedData.website,
             starting_price: cleanedData.starting_price,
+            instagram_url: cleanedData.instagram_url,
             profile_image: profileImageUrl,
             business_type: cleanedData.business_type,
             google_location_url: cleanedData.google_location_url,
@@ -964,6 +969,26 @@ const DesignerRegistration = () => {
                         placeholder="https://yourwebsite.com"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Instagram Profile URL
+                    </label>
+                    <div className="relative">
+                      <FaInstagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" style={{ width: '20px', height: '20px' }} />
+                      <input
+                        type="url"
+                        name="instagram_url"
+                        value={formData.instagram_url}
+                        onChange={handleInputChange}
+                        className="pl-10 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="https://www.instagram.com/yourusername"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Share your Instagram portfolio to attract more clients
+                    </p>
                   </div>
 
                   <div>
