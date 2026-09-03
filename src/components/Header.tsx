@@ -152,7 +152,7 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <img
-                src="/thehomedesigners.png"
+                src="/icons/icon.svg"
                 alt=""
                 className="h-10 w-auto"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

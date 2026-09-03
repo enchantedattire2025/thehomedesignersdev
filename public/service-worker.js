@@ -1,4 +1,4 @@
-const CACHE_NAME = 'interior-design-v1';
+const CACHE_NAME = 'interior-design-v2';
 const urlsToCache = [
   '/',
   '/index.html',

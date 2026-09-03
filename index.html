@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/thehomedesigners.png" />
-    <link rel="shortcut icon" href="/thehomedesigners.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Connect with top interior designers in India. Transform your space with professional design services." />
     <meta name="theme-color" content="#3D5A80" />
@@ -15,18 +15,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="HomeDesigners" />
-    <link rel="apple-touch-icon" href="/thehomedesigners.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/thehomedesigners.png" />
-    <link rel="apple-touch-icon" sizes="512x512" href="/thehomedesigners.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
 
-    <!-- PayPal SDK (Production) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AaY7R9hGocTUocwCDxme_AGkXSzhFRySbQAPBiX6Rni99aihEYr-zFMxM6opBjp3Nm5qbmMbRE5LI0IH&currency=USD"></script>
+    <!-- PayPal SDK (Production) - loaded async so it never blocks page render -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AaY7R9hGocTUocwCDxme_AGkXSzhFRySbQAPBiX6Rni99aihEYr-zFMxM6opBjp3Nm5qbmMbRE5LI0IH&currency=USD" async></script>
 
     <title>TheHomeDesigners - Premium Home Interior Designers in India</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  </head>
+    <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
