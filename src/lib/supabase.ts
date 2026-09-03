@@ -112,8 +112,11 @@ function createMockClient(): any {
     }),
     channel: (name: string) => ({
       on: () => ({ subscribe: () => ({}) }),
-      unsubscribe: () => {}
-    })
+      unsubscribe: () => {},
+      subscribe: () => ({})
+    }),
+    removeChannel: () => {},
+    removeAllChannels: () => {}
   };
 }
 

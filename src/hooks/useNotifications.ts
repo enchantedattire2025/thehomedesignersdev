@@ -22,41 +22,53 @@ export function useNotifications() {
   useEffect(() => {
     fetchNotifications();
 
-    // Subscribe to real-time updates
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setNotifications((prev) => [payload.new as Notification, ...prev]);
-            if (!(payload.new as Notification).is_read) {
-              setUnreadCount((prev) => prev + 1);
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    try {
+      // Subscribe to real-time updates
+      channel = supabase
+        .channel('notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notifications',
+          },
+          (payload) => {
+            if (payload.eventType === 'INSERT') {
+              setNotifications((prev) => [payload.new as Notification, ...prev]);
+              if (!(payload.new as Notification).is_read) {
+                setUnreadCount((prev) => prev + 1);
+              }
+            } else if (payload.eventType === 'UPDATE') {
+              setNotifications((prev) =>
+                prev.map((notif) =>
+                  notif.id === payload.new.id ? (payload.new as Notification) : notif
+                )
+              );
+              // Recalculate unread count
+              fetchNotifications();
+            } else if (payload.eventType === 'DELETE') {
+              setNotifications((prev) =>
+                prev.filter((notif) => notif.id !== payload.old.id)
+              );
             }
-          } else if (payload.eventType === 'UPDATE') {
-            setNotifications((prev) =>
-              prev.map((notif) =>
-                notif.id === payload.new.id ? (payload.new as Notification) : notif
-              )
-            );
-            // Recalculate unread count
-            fetchNotifications();
-          } else if (payload.eventType === 'DELETE') {
-            setNotifications((prev) =>
-              prev.filter((notif) => notif.id !== payload.old.id)
-            );
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    } catch (err) {
+      console.error('Failed to subscribe to notifications realtime:', err);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      try {
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+      } catch (err) {
+        console.error('Error removing notification channel:', err);
+      }
     };
   }, []);
 
