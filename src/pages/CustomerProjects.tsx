@@ -264,8 +264,11 @@ interface Quote {
         if (quotesError) {
           console.error('Error fetching shared project quotes:', quotesError);
         } else {
-          sharedQuotesData = quotesData || [];
-        }
+  sharedQuotesData = quotesData || [];
+
+  console.log('DEBUG sharedProjectIds:', sharedProjectIds);
+  console.log('DEBUG sharedQuotesData:', sharedQuotesData);
+}
       }
 
       // Set accepted quotes from both assigned and shared
