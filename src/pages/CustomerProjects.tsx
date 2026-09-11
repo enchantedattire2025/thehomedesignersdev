@@ -809,6 +809,13 @@ interface Quote {
               {projectShares.map((share) => {
                 // Find all quotes for this shared project
                 const projectQuotesForShare = acceptedQuotes.filter(q => q.project_id === share.project_id);
+              console.log('SHARED BILL DEBUG:', {
+  projectId: share.project_id,
+  quotes: projectQuotesForShare,
+  accepted: projectQuotesForShare.some(
+    q => q.customer_accepted === true
+  )
+});
                 return (
                 <div key={share.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   {/* Project Header */}
