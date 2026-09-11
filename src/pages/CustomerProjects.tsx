@@ -807,15 +807,7 @@ interface Quote {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projectShares.map((share) => {
-                // Find all quotes for this shared project
                 const projectQuotesForShare = acceptedQuotes.filter(q => q.project_id === share.project_id);
-              console.log('SHARED BILL DEBUG:', {
-  projectId: share.project_id,
-  quotes: projectQuotesForShare,
-  accepted: projectQuotesForShare.some(
-    q => q.customer_accepted === true
-  )
-});
                 return (
                 <div key={share.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   {/* Project Header */}
@@ -968,14 +960,24 @@ interface Quote {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex space-x-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
-                        onClick={() => navigate(`/generate-quote/${share.project.id}`)}
+                        onClick={() => navigate(`/generate-quote/${share.project_id}`)}
                         className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-2 px-3 rounded-lg font-medium transition-colors text-center flex items-center justify-center space-x-2"
                       >
                         <FileText className="w-4 h-4" />
                         <span>Create Quotation</span>
                       </button>
+                      {projectQuotesForShare.some(q => q.customer_accepted === true) && (
+                        <button
+                          onClick={() => navigate(`/project-bill/${share.project_id}`)}
+                          className="bg-teal-500 hover:bg-teal-600 text-white py-2 px-3 rounded-lg font-medium transition-colors flex items-center gap-1"
+                          title="Manage Bill"
+                        >
+                          <FileText className="w-4 h-4" />
+                          <span className="text-xs">Bill</span>
+                        </button>
+                      )}
                       <a
                         href={`mailto:${share.project.email}?subject=Regarding your ${share.project.project_name} project&body=Hi ${share.project.name},%0D%0A%0D%0AThank you for sharing your project details with me. I would love to discuss your ${share.project.project_name} project further.%0D%0A%0D%0ABest regards,%0D%0A${designer.name}`}
                         className="bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg font-medium transition-colors flex items-center justify-center"
