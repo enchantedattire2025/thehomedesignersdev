@@ -742,7 +742,7 @@ interface Quote {
                       >
                         <Upload className="w-4 h-4" />
                       </button>
-                      {projectQuotes[project.id] && (
+                      {projectQuotesForShare.length > 0 && (
                         <button
                           onClick={() => navigate(`/project-bill/${project.id}`)}
                           className="bg-teal-500 hover:bg-teal-600 text-white py-2 px-3 rounded-lg font-medium transition-colors flex items-center gap-1"
