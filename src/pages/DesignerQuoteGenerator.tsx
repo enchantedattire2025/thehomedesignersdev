@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -214,6 +214,7 @@ const DesignerQuoteGenerator = () => {
   const [modularPerSqftRate, setModularPerSqftRate] = useState<number>(0);
   const [quoteType, setQuoteType] = useState<'material' | 'modular'>('material');
   const [showModularVoiceInput, setShowModularVoiceInput] = useState(false);
+  const isSavingRef = useRef(false);
 
   const MODULAR_PRESET_RATES = [1600, 1800, 2000, 2200];
   const [quoteData, setQuoteData] = useState<QuoteData>({
@@ -512,7 +513,8 @@ const DesignerQuoteGenerator = () => {
             unit: material.unit,
             unit_price: unitPrice,
             discount_percent: 0,
-            amount: 1 * quantity * unitPrice
+            amount: 1 * quantity * unitPrice,
+            section: 'on_site'
           });
         }
       }
@@ -541,6 +543,7 @@ const DesignerQuoteGenerator = () => {
       amount: 1 * voiceItem.quantity * voiceItem.unitPrice,
       width: voiceItem.width,
       height: voiceItem.height,
+      section: 'on_site',
     };
     setQuoteData(prev => ({ ...prev, items: [...prev.items, newItem] }));
   };
@@ -663,6 +666,8 @@ const DesignerQuoteGenerator = () => {
 
   const handleSaveQuote = async (status: 'draft' | 'sent' = 'draft') => {
     if (!designer || !customer) return;
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
     
     try {
       setSaving(true);
@@ -728,7 +733,7 @@ const DesignerQuoteGenerator = () => {
         width: item.width,
         height: item.height,
         depth: item.depth,
-        section: item.section,
+        section: item.section || 'on_site',
         width_unit: item.section === 'modular' ? item.width_unit : null,
         height_unit: item.section === 'modular' ? item.height_unit : null,
         depth_unit: item.section === 'modular' ? item.depth_unit : null,
@@ -753,6 +758,7 @@ const DesignerQuoteGenerator = () => {
       setError(error.message || 'Failed to save quote');
     } finally {
       setSaving(false);
+      isSavingRef.current = false;
     }
   };
 
