@@ -145,6 +145,31 @@ interface Quote {
     fetchProjects();
   }, [user, designer, isDesigner, authLoading, designerLoading, designerError, navigate]);
 
+  // Realtime: refresh projects when quotes change (e.g. customer accepts/rejects)
+  useEffect(() => {
+    if (!designer) return;
+
+    const channel = supabase
+      .channel('designer-customer-projects-quotes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'designer_quotes',
+          filter: `designer_id=eq.${designer.id}`,
+        },
+        () => {
+          fetchProjects();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [designer]);
+
   const fetchProjects = async () => {
     if (!user || !designer) {
       console.log('Cannot fetch - missing user or designer');
@@ -934,7 +959,12 @@ interface Quote {
                                     <p className="text-sm font-semibold text-blue-700">
                                       ₹{quote.total_amount.toLocaleString()}
                                     </p>
-                                    {quote.customer_accepted ? (
+                                    {quote.status === 'rejected' ? (
+                                      <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1">
+                                        <XCircle className="w-3 h-3" />
+                                        <span>Rejected</span>
+                                      </span>
+                                    ) : quote.customer_accepted ? (
                                       <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1">
                                         <CheckCircle className="w-3 h-3" />
                                         <span>Accepted</span>
