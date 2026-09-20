@@ -258,8 +258,43 @@ const CustomerQuotes = () => {
         setUploadingReceipt(false);
       }
 
-      // Update the quote with acceptance info and get the project_id in one operation
-      const { data: updatedQuote, error: updateError } = await supabase
+      // First, fetch the quote to get project_id and designer_id
+      const { data: quoteData, error: fetchError } = await supabase
+        .from('designer_quotes')
+        .select('project_id, designer_id')
+        .eq('id', quoteId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('Error fetching quote:', fetchError);
+        throw new Error(fetchError.message || 'Failed to fetch quote');
+      }
+
+      if (!quoteData) {
+        throw new Error('Quote not found or you do not have permission to accept it');
+      }
+
+      // Update the customer project status from 'shared' to 'assigned' BEFORE
+      // marking the quote as accepted, because the RLS policy blocks customer
+      // updates once an accepted quote exists.
+      if (quoteData.project_id && quoteData.designer_id) {
+        const { error: projectError } = await supabase
+          .from('customers')
+          .update({
+            assignment_status: 'assigned',
+            assigned_designer_id: quoteData.designer_id
+          })
+          .eq('id', quoteData.project_id)
+          .eq('user_id', user.id);
+
+        if (projectError) {
+          console.error('Error updating project status:', projectError);
+          throw new Error('Failed to assign project: ' + projectError.message);
+        }
+      }
+
+      // Now mark the quote as accepted
+      const { error: updateError } = await supabase
         .from('designer_quotes')
         .update({
           customer_accepted: true,
@@ -268,34 +303,11 @@ const CustomerQuotes = () => {
           status: 'accepted',
           payment_receipt_url: paymentReceiptUrl
         })
-        .eq('id', quoteId)
-        .select('project_id, designer_id')
-        .maybeSingle();
+        .eq('id', quoteId);
 
       if (updateError) {
         console.error('Error updating quote:', updateError);
         throw new Error(updateError.message || 'Failed to accept quote');
-      }
-
-      if (!updatedQuote) {
-        throw new Error('Quote not found or you do not have permission to accept it');
-      }
-
-      // Update the customer project status from 'shared' to 'assigned'
-      // Also ensure assigned_designer_id is set correctly
-      if (updatedQuote.project_id && updatedQuote.designer_id) {
-        const { error: projectError } = await supabase
-          .from('customers')
-          .update({
-            assignment_status: 'assigned',
-            assigned_designer_id: updatedQuote.designer_id
-          })
-          .eq('id', updatedQuote.project_id)
-          .eq('user_id', user.id);
-
-        if (projectError) {
-          console.error('Error updating project status:', projectError);
-        }
       }
 
       setSuccessMessage('Quote accepted successfully! The project has been assigned to your designer.');
