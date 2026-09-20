@@ -99,6 +99,7 @@ interface Quote {
   updated_at: string;
   acceptance_date?: string;
   customer_accepted?: boolean;
+  customer_feedback?: string | null;
   items?: any[];
 }
 
@@ -1124,6 +1125,21 @@ interface Quote {
             <h4 className="font-semibold text-secondary-800 mb-3">Terms & Conditions</h4>
             <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-600">
               {selectedQuote.terms_and_conditions}
+            </div>
+          </div>
+        )}
+
+        {selectedQuote.status === 'rejected' && selectedQuote.customer_feedback && (
+          <div className="mb-6">
+            <h4 className="font-semibold text-secondary-800 mb-3">Customer Feedback</h4>
+            <div className="bg-red-50 border border-red-200 p-4 rounded-lg text-sm text-red-800">
+              <div className="flex items-start space-x-2">
+                <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-red-900 mb-1">This quote was rejected by the customer</p>
+                  <p className="text-red-700">{selectedQuote.customer_feedback}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
