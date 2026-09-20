@@ -64,6 +64,31 @@ const DesignerQuotes = () => {
     }
   }, [designer, designerLoading]);
 
+  // Realtime: refresh quotes when the designer_quotes table changes
+  useEffect(() => {
+    if (!designer) return;
+
+    const channel = supabase
+      .channel('designer-quotes-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'designer_quotes',
+          filter: `designer_id=eq.${designer.id}`,
+        },
+        () => {
+          fetchQuotes();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [designer]);
+
   const fetchQuotes = async () => {
     if (!designer) return;
 
