@@ -603,6 +603,7 @@ interface Quote {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {assignedProjects.map((project) => {
               const acceptedQuote = acceptedQuotes.find(q => q.project_id === project.id);
+              const projectQuotesForShare = acceptedQuotes.filter(q => q.project_id === project.id);
               return (
                 <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   {/* Project Header */}
