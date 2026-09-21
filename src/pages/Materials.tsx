@@ -420,13 +420,13 @@ const Materials = () => {
                     {material.category}
                   </span>
                 </div>
-                {material.ecoFriendly && (
+                
                   <div className="absolute top-4 right-4">
                     <div className="bg-green-500 text-white p-2 rounded-full" title="Eco-Friendly">
                       <Layers className="w-4 h-4" />
                     </div>
                   </div>
-                )}
+                
               </div>
 
               <div className="p-6">
