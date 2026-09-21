@@ -95,7 +95,7 @@ const ProjectDetail = () => {
         }),
         area: projectData.project_area || 'Not specified',
         client: projectData.name,
-        description: JSON.stringify(projectData.requirements),
+        description: projectData.requirements || 'No requirements specified.',
         challenge: projectData.challenges_solutions || projectData.special_requirements || 'Creating a functional and beautiful space that meets all the client requirements within the specified budget and timeline.',
         solution: projectData.challenges_solutions ? '' : `Our team worked closely with ${projectData.name} to understand their vision and requirements. We implemented a comprehensive design solution that maximized the available space while incorporating their preferred style and functional needs.`,
         images: extractProjectImages(projectData.project_images || []),
