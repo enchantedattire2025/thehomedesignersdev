@@ -324,15 +324,15 @@ const Materials = () => {
   ];
 
   const filteredMaterials = materials.filter(material => {
-    const matchesCategory = selectedCategory === 'All' || material.category === selectedCategory;
-    const matchesSearch = !searchTerm ||
-      material.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      material.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      material.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      material.applications.some(app => app.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      material.brands.some(brand => brand.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  const matchesCategory =
+    selectedCategory === 'All' || material.category === selectedCategory;
+
+  const matchesSearch =
+    !searchTerm ||
+    material.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+  return matchesCategory && matchesSearch;
+});
 
   const getRatingStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
