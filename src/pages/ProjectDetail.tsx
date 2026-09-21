@@ -95,7 +95,7 @@ const ProjectDetail = () => {
         }),
         area: projectData.project_area || 'Not specified',
         client: projectData.name,
-        description: projectData.requirements,
+        description: JSON.stringify(projectData.requirements),
         challenge: projectData.challenges_solutions || projectData.special_requirements || 'Creating a functional and beautiful space that meets all the client requirements within the specified budget and timeline.',
         solution: projectData.challenges_solutions ? '' : `Our team worked closely with ${projectData.name} to understand their vision and requirements. We implemented a comprehensive design solution that maximized the available space while incorporating their preferred style and functional needs.`,
         images: extractProjectImages(projectData.project_images || []),
@@ -577,13 +577,8 @@ const ProjectDetail = () => {
                 </div>
               </div>
 
-             <p className="text-gray-600 leading-relaxed mb-6">
-                {typeof project.description === 'string'
-                  ? project.description
-                      .split('\n')
-                      .filter(line => line.trim() !== '0')
-                      .join('\n')
-                  : project.description}
+              <p className="text-gray-600 leading-relaxed mb-6">
+                {project.description}
               </p>
 
               <div className="flex flex-wrap gap-2">
