@@ -577,8 +577,13 @@ const ProjectDetail = () => {
                 </div>
               </div>
 
-              <p className="text-gray-600 leading-relaxed mb-6">
-                {project.description}
+             <p className="text-gray-600 leading-relaxed mb-6">
+                {typeof project.description === 'string'
+                  ? project.description
+                      .split('\n')
+                      .filter(line => line.trim() !== '0')
+                      .join('\n')
+                  : project.description}
               </p>
 
               <div className="flex flex-wrap gap-2">
