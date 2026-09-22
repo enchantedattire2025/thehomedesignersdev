@@ -801,7 +801,7 @@ export default function WallpaperOrder() {
                 </label>
                 <textarea
                   rows={3}
-                  maxLength={6}
+                  maxLength={500}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Any special requirements or instructions..."
