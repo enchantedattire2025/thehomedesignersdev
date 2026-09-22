@@ -670,7 +670,7 @@ export default function WallpaperOrder() {
     const value = e.target.value;
 
     // Allow only numbers with up to 10 characters
-    if (/^\d*\.?\d{0,2}$/.test(value) && value.replace('.', '').length <= 10) {
+    if (/^\d*\.?\d{0,2}$/.test(value) && value.replace('.', '').length <= 15) {
       setFormData({
         ...formData,
         wall_size_length: value
