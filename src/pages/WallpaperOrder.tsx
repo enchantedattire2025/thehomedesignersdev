@@ -660,17 +660,25 @@ export default function WallpaperOrder() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Wall Length <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    maxLength={10}
-                    required
-                    step="0.01"
-                    min="0"
-                    value={formData.wall_size_length}
-                    onChange={(e) => setFormData({ ...formData, wall_size_length: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                 <input
+  type="text"
+  inputMode="decimal"
+  required
+  step="0.01"
+  value={formData.wall_size_length}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Allow only numbers with up to 10 characters
+    if (/^\d*\.?\d{0,2}$/.test(value) && value.replace('.', '').length <= 10) {
+      setFormData({
+        ...formData,
+        wall_size_length: value
+      });
+    }
+  }}
+  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+/>
                 </div>
 
                 <div>
