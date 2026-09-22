@@ -662,6 +662,7 @@ export default function WallpaperOrder() {
                   </label>
                   <input
                     type="number"
+                    maxLength={10}
                     required
                     step="0.01"
                     min="0"
