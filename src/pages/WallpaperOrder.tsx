@@ -690,7 +690,7 @@ export default function WallpaperOrder() {
   inputMode="decimal"
   required
   step="0.01"
-  value={formData.wall_size_length}
+  value={formData.wall_size_height}
   onChange={(e) => {
     const value = e.target.value;
 
@@ -698,7 +698,7 @@ export default function WallpaperOrder() {
     if (/^\d*\.?\d{0,2}$/.test(value) && value.replace('.', '').length <= 10) {
       setFormData({
         ...formData,
-        wall_size_length: value
+        wall_size_height: value
       });
     }
   }}
