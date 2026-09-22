@@ -670,7 +670,7 @@ export default function WallpaperOrder() {
 
     if (
       /^\d*\.?\d{0,2}$/.test(value) &&
-      value.replace('.', '').length <= 10
+      value.replace('.', '').length <= 15
     ) {
       setFormData({
         ...formData,
@@ -696,7 +696,7 @@ export default function WallpaperOrder() {
 
     if (
       /^\d*\.?\d{0,2}$/.test(value) &&
-      value.replace('.', '').length <= 10
+      value.replace('.', '').length <= 15
     ) {
       setFormData({
         ...formData,
