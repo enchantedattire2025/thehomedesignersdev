@@ -553,7 +553,7 @@ export default function WallpaperOrder() {
                     required
                     value={formData.customer_name}
                     onChange={(e) => {
-  const value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+  const value = e.target.value.replace(/[^a-zA-Z\s'-]/g, '');
   setFormData({ ...formData, customer_name: value });
 }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
