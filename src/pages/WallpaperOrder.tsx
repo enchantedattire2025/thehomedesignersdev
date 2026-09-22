@@ -661,7 +661,8 @@ export default function WallpaperOrder() {
                     Wall Length <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     maxLength={10}
                     required
                     step="0.01"
