@@ -589,6 +589,7 @@ export default function WallpaperOrder() {
                 <textarea
                   required
                   rows={2}
+                  maxLength={150}
                   value={formData.customer_address}
                   onChange={(e) => setFormData({ ...formData, customer_address: e.target.value })}
                   placeholder="House/Flat No, Building Name, Street Name"
