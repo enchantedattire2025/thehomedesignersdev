@@ -304,6 +304,7 @@ const ProjectStatusUpdate: React.FC<ProjectStatusUpdateProps> = ({
                     project_timeline_details: e.target.value
                   })}
                   rows={5}
+                  maxLength={500}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Provide a detailed timeline of the project execution, including key milestones and completion dates."
                 />
@@ -324,6 +325,7 @@ const ProjectStatusUpdate: React.FC<ProjectStatusUpdateProps> = ({
                     materials_cost_breakdown: e.target.value
                   })}
                   rows={6}
+                  maxLength={500}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="List the materials used and their approximate costs. This helps customers understand budget allocation."
                 />
