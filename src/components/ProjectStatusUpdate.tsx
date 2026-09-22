@@ -283,6 +283,7 @@ const ProjectStatusUpdate: React.FC<ProjectStatusUpdateProps> = ({
                     challenges_solutions: e.target.value
                   })}
                   rows={5}
+                  maxLength={1000}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Describe the challenges you faced during the project and how you solved them. This helps customers understand your problem-solving approach."
                 />
