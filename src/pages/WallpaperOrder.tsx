@@ -690,13 +690,14 @@ export default function WallpaperOrder() {
   type="text"
   inputMode="decimal"
   required
-  step="0.01"
   value={formData.wall_size_height}
   onChange={(e) => {
     const value = e.target.value;
 
-    // Allow only numbers with up to 10 characters
-    if (/^\d*\.?\d{0,2}$/.test(value) && value.replace('.', '').length <= 15  ) {
+    if (
+      /^\d*\.?\d{0,2}$/.test(value) &&
+      value.replace('.', '').length <= 10
+    ) {
       setFormData({
         ...formData,
         wall_size_height: value
