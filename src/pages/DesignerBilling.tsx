@@ -710,14 +710,14 @@ const DesignerBilling = () => {
                 {displayItems.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50/50">
                     <td className="px-4 py-2 text-gray-400">{index + 1}</td>
-                    <td className="px-4 py-2 min-w-[120px]">
+                    <td className="px-4 py-2 min-w-[140px] w-[140px]">
                       {viewingVersion ? (
                         <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 capitalize">{item.item_type}</span>
                       ) : (
                         <select
                           value={item.item_type}
                           onChange={(e) => handleItemChange(index, 'item_type', e.target.value)}
-                         className="w-full min-w-[100px] px-2 py-1.5 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                         className="w-full min-w-[120px] px-2 py-1.5 border border-gray-200 rounded text-xs bg-white"
                         >
                           <option value="material">Material</option>
                           <option value="labor">Labor</option>
