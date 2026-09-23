@@ -262,7 +262,8 @@ export default function WallpaperOrder() {
       setPhoneError('Phone number must contain only numbers');
       return false;
     }
-    if (cleaned.length !== 10) {
+    if (cleaned.length !== 10) 
+    {
       setPhoneError('Phone number must be exactly 10 digits');
       return false;
     }
