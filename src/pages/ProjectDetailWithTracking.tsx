@@ -572,7 +572,7 @@ const ProjectDetailWithTracking = () => {
                 )}
 
                 {/* Project Schedule & Pricing */}
-                {((project as any).work_begin_date || (project as any).work_end_date || ((project as any).per_day_discount && (project as any).per_day_discount > 0)) && (
+                {Boolean((project as any).work_begin_date || (project as any).work_end_date || ((project as any).per_day_discount && (project as any).per_day_discount > 0)) && (
                   <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
                     <h3 className="text-lg font-semibold text-secondary-800 mb-4 flex items-center space-x-2">
                       <Calendar className="w-5 h-5 text-blue-600" />
