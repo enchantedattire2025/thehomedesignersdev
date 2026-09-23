@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { useDesignerProfile } from './hooks/useDesignerProfile';
@@ -10,49 +10,50 @@ import Chatbot from './components/Chatbot';
 import InstallPrompt from './components/InstallPrompt';
 import ProtectedDesignerRoute from './components/ProtectedDesignerRoute';
 import Home from './pages/Home';
-import Designers from './pages/Designers';
-import Projects from './pages/Projects';
-import Gallery from './pages/Gallery';
-import Materials from './pages/Materials';
-import DesignerDetail from './pages/DesignerDetail';
-import ProjectDetail from './pages/ProjectDetail';
-import DesignerRegistration from './pages/DesignerRegistration';
-import CustomerRegistration from './pages/CustomerRegistration';
-import MyProjects from './pages/MyProjects';
-import EditProject from './pages/EditProject';
-import CustomerProjects from './pages/CustomerProjects';
-import ProjectDetailWithTracking from './pages/ProjectDetailWithTracking';
-import DesignerDashboard from './pages/DesignerDashboard';
-import DesignerMaterialPricing from './pages/DesignerMaterialPricing';
-import DesignerQuotes from './pages/DesignerQuotes';
-import DesignerQuoteGenerator from './pages/DesignerQuoteGenerator';
-import CustomerQuotes from './pages/CustomerQuotes';
-import QuoteViewer from './pages/QuoteViewer';
-import DesignerSubscription from './pages/DesignerSubscription';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminDealsManagement from './pages/AdminDealsManagement';
-import AdminSubscriptionManagement from './pages/AdminSubscriptionManagement';
-import AdminVideoManagement from './pages/AdminVideoManagement';
-import AdminWhatsAppSettings from './pages/AdminWhatsAppSettings';
-import AdminLogin from './pages/AdminLogin';
-import DebugPage from './pages/DebugPage';
-import DebugDesignerProfile from './pages/DebugDesignerProfile';
-import SharePhotoForm from './pages/SharePhotoForm';
-import ClearSession from './pages/ClearSession';
-import DesignTool from './pages/DesignTool';
-import EmailConfirmation from './pages/EmailConfirmation';
-import WallpaperOrder from './pages/WallpaperOrder';
-import WallpaperGallery from './pages/WallpaperGallery';
-import AdminWallpaperOrders from './pages/AdminWallpaperOrders';
-import Admin3DWallpapers from './pages/Admin3DWallpapers';
-import AdminAuthDebug from './pages/AdminAuthDebug';
-import My3DWallpaperOrders from './pages/My3DWallpaperOrders';
-import DesignerBilling from './pages/DesignerBilling';
-import CustomerBillView from './pages/CustomerBillView';
-import BillDashboard from './pages/BillDashboard';
-import OfflineBillEditor from './pages/OfflineBillEditor';
 import { forceLogoutAll } from './utils/clearAuth';
 import { debugAuthState } from './utils/debugDesigner';
+
+const Designers = lazy(() => import('./pages/Designers'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Gallery = lazy(() => import('./pages/Gallery'));
+const Materials = lazy(() => import('./pages/Materials'));
+const DesignerDetail = lazy(() => import('./pages/DesignerDetail'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const DesignerRegistration = lazy(() => import('./pages/DesignerRegistration'));
+const CustomerRegistration = lazy(() => import('./pages/CustomerRegistration'));
+const MyProjects = lazy(() => import('./pages/MyProjects'));
+const EditProject = lazy(() => import('./pages/EditProject'));
+const CustomerProjects = lazy(() => import('./pages/CustomerProjects'));
+const ProjectDetailWithTracking = lazy(() => import('./pages/ProjectDetailWithTracking'));
+const DesignerDashboard = lazy(() => import('./pages/DesignerDashboard'));
+const DesignerMaterialPricing = lazy(() => import('./pages/DesignerMaterialPricing'));
+const DesignerQuotes = lazy(() => import('./pages/DesignerQuotes'));
+const DesignerQuoteGenerator = lazy(() => import('./pages/DesignerQuoteGenerator'));
+const CustomerQuotes = lazy(() => import('./pages/CustomerQuotes'));
+const QuoteViewer = lazy(() => import('./pages/QuoteViewer'));
+const DesignerSubscription = lazy(() => import('./pages/DesignerSubscription'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminDealsManagement = lazy(() => import('./pages/AdminDealsManagement'));
+const AdminSubscriptionManagement = lazy(() => import('./pages/AdminSubscriptionManagement'));
+const AdminVideoManagement = lazy(() => import('./pages/AdminVideoManagement'));
+const AdminWhatsAppSettings = lazy(() => import('./pages/AdminWhatsAppSettings'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const DebugPage = lazy(() => import('./pages/DebugPage'));
+const DebugDesignerProfile = lazy(() => import('./pages/DebugDesignerProfile'));
+const SharePhotoForm = lazy(() => import('./pages/SharePhotoForm'));
+const ClearSession = lazy(() => import('./pages/ClearSession'));
+const DesignTool = lazy(() => import('./pages/DesignTool'));
+const EmailConfirmation = lazy(() => import('./pages/EmailConfirmation'));
+const WallpaperOrder = lazy(() => import('./pages/WallpaperOrder'));
+const WallpaperGallery = lazy(() => import('./pages/WallpaperGallery'));
+const AdminWallpaperOrders = lazy(() => import('./pages/AdminWallpaperOrders'));
+const Admin3DWallpapers = lazy(() => import('./pages/Admin3DWallpapers'));
+const AdminAuthDebug = lazy(() => import('./pages/AdminAuthDebug'));
+const My3DWallpaperOrders = lazy(() => import('./pages/My3DWallpaperOrders'));
+const DesignerBilling = lazy(() => import('./pages/DesignerBilling'));
+const CustomerBillView = lazy(() => import('./pages/CustomerBillView'));
+const BillDashboard = lazy(() => import('./pages/BillDashboard'));
+const OfflineBillEditor = lazy(() => import('./pages/OfflineBillEditor'));
 
 // Expose utilities to window for emergency use and debugging
 if (typeof window !== 'undefined') {
@@ -128,6 +129,7 @@ function App() {
         <DashboardRedirectHandler />
         <Header />
         <main className="flex-grow">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/designers" element={<Designers />} />
@@ -174,6 +176,7 @@ function App() {
             <Route path="/offline-bill/:billId" element={<ProtectedDesignerRoute><OfflineBillEditor /></ProtectedDesignerRoute>} />
             <Route path="/auth/confirm" element={<EmailConfirmation />} />
           </Routes>
+          </Suspense>
         </main>
         <Footer />
         <Chatbot />
