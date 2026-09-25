@@ -293,59 +293,64 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleToggleDesignerStatus = async (designerId: string, active: boolean) => {
-          const handleSaveDesigner = async () => {
-        if (!editingDesigner) return;
+ const handleToggleDesignerStatus = async (designerId: string, active: boolean) => {
+  try {
+    const { error } = await supabase
+      .from('designers')
+      .update({ is_active: active })
+      .eq('id', designerId);
 
-        try {
-          setSavingDesigner(true);
-      
-          const { error } = await supabase
-            .from('designers')
-            .update({
-              name: editingDesigner.name,
-              email: editingDesigner.email,
-              specialization: editingDesigner.specialization,
-              location: editingDesigner.location,
-              experience: editingDesigner.experience
-            })
-            .eq('id', editingDesigner.id);
-      
-          if (error) throw error;
-      
-          setDesigners(prev =>
-            prev.map(d =>
-              d.id === editingDesigner.id ? editingDesigner : d
-            )
-          );
-      
-          setEditingDesigner(null);
-      
-          alert('Designer updated successfully!');
-        } catch (error) {
-          console.error('Error updating designer:', error);
-          alert('Failed to update designer. Please try again.');
-        } finally {
-          setSavingDesigner(false);
-        }
-      };
-    try {
-      const { error } = await supabase
-        .from('designers')
-        .update({ is_active: active })
-        .eq('id', designerId);
+    if (error) throw error;
 
-      if (error) throw error;
+    setDesigners(prev =>
+      prev.map(d =>
+        d.id === designerId
+          ? { ...d, is_active: active }
+          : d
+      )
+    );
+  } catch (error) {
+    console.error('Error updating designer status:', error);
+  }
+};
 
-      // Update local state
-      setDesigners(prev => prev.map(d => 
-        d.id === designerId ? { ...d, is_active: active } : d
-      ));
+const handleSaveDesigner = async () => {
+  if (!editingDesigner) return;
 
-    } catch (error) {
-      console.error('Error updating designer status:', error);
-    }
-  };
+  try {
+    setSavingDesigner(true);
+
+    const { error } = await supabase
+      .from('designers')
+      .update({
+        name: editingDesigner.name,
+        email: editingDesigner.email,
+        specialization: editingDesigner.specialization,
+        location: editingDesigner.location,
+        experience: editingDesigner.experience
+      })
+      .eq('id', editingDesigner.id);
+
+    if (error) throw error;
+
+    setDesigners(prev =>
+      prev.map(d =>
+        d.id === editingDesigner.id
+          ? editingDesigner
+          : d
+      )
+    );
+
+    setEditingDesigner(null);
+
+    alert('Designer updated successfully!');
+  } catch (error) {
+    console.error('Error updating designer:', error);
+    alert('Failed to update designer. Please try again.');
+  } finally {
+    setSavingDesigner(false);
+  }
+};
 
   const filteredDesigners = designers.filter(designer =>
     designer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
