@@ -60,6 +60,7 @@ export default function WallpaperOrder() {
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const paypalButtonsRendered = useRef(false);
   const [nameError, setNameError] = useState('');
+  const [wallLengthError, setWallLengthError] = useState('');
 
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -696,27 +697,42 @@ export default function WallpaperOrder() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Wall Length <span className="text-red-500">*</span>
                   </label>
-                 <input
-  type="text"
-  inputMode="decimal"
-  required
-  value={formData.wall_size_length}
-  onChange={(e) => {
-    const value = e.target.value;
-
-    if (
-      /^\d*\.?\d{0,2}$/.test(value) &&
-      value.replace('.', '').length <= 15
-    ) {
-      setFormData({
-        ...formData,
-        wall_size_length: value
-      });
-    }
-  }}
-  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-/>
+              
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    required
+                    value={formData.wall_size_length}
+                    onChange={(e) => {
+                      const value = e.target.value;
+              
+                      if (!/^\d*\.?\d{0,2}$/.test(value)) {
+                        setWallLengthError('Wall Length must contain numbers only.');
+                        return;
+                      }
+              
+                      if (value.replace('.', '').length > 15) {
+                        setWallLengthError('Wall Length cannot exceed 15 digits.');
+                        return;
+                      }
+              
+                      setWallLengthError('');
+              
+                      setFormData({
+                        ...formData,
+                        wall_size_length: value
+                      });
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+              
+                  {wallLengthError && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {wallLengthError}
+                    </p>
+                  )}
                 </div>
+              </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
