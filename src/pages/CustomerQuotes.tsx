@@ -97,7 +97,7 @@ const CustomerQuotes = () => {
   const [selectedProjectForAssignment, setSelectedProjectForAssignment] = useState<any>(null);
   const [paymentReceiptFile, setPaymentReceiptFile] = useState<File | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
