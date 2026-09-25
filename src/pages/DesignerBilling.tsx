@@ -699,7 +699,7 @@ const DesignerBilling = () => {
                   <th className="text-left px-4 py-3 font-medium">H</th>
                   <th className="text-left px-4 py-3 font-medium">D</th>
                   <th className="text-left px-4 py-3 font-medium">Qty</th>
-                  <th className="text-left px-4 py-3 font-medium">Unit</th>
+                  <th className="text-left px-4 py-3 font-medium min-w-[120px] w-[120px]">Unit</th>
                   <th className="text-left px-4 py-3 font-medium">Rate</th>
                   <th className="text-left px-4 py-3 font-medium">Disc%</th>
                   <th className="text-right px-4 py-3 font-medium">Amount</th>
