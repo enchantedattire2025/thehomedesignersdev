@@ -808,15 +808,17 @@ const DesignerBilling = () => {
                         />
                       )}
                     </td>
-                    <td className="px-4 py-2">
-                      {viewingVersion ? (
-                        <span className="text-xs text-gray-600">{item.unit}</span>
-                      ) : (
-                        <select
-                          value={item.unit}
-                          onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
-                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                        >
+                    <td className="px-4 py-2 min-w-[120px] w-[120px]">
+  {viewingVersion ? (
+    <span className="text-xs text-gray-600 whitespace-nowrap">
+      {item.unit}
+    </span>
+  ) : (
+    <select
+      value={item.unit}
+      onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
+      className="!w-[100px] !min-w-[100px] px-2 py-1.5 border border-gray-200 rounded text-xs bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+    >
                           <option value="sq.ft">sq.ft</option>
                           <option value="sq.m">sq.m</option>
                           <option value="per meter">per meter</option>
