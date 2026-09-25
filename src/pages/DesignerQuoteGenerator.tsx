@@ -211,7 +211,6 @@ const DesignerQuoteGenerator = () => {
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [selectedMaterials, setSelectedMaterials] = useState<{[key: string]: number}>({});
   const [materialSearchQuery, setMaterialSearchQuery] = useState('');
-  const [modularPerSqftRate, setModularPerSqftRate] = useState<number>(0);
   const [quoteType, setQuoteType] = useState<'material' | 'modular'>('material');
   const [showModularVoiceInput, setShowModularVoiceInput] = useState(false);
   const isSavingRef = useRef(false);
@@ -428,7 +427,7 @@ const DesignerQuoteGenerator = () => {
       number_of_units: 1,
       quantity: 1,
       unit: 'sq.ft',
-      unit_price: modularPerSqftRate || 0,
+      unit_price: 0,
       discount_percent: 0,
       amount: 0,
       section: 'modular',
@@ -439,35 +438,12 @@ const DesignerQuoteGenerator = () => {
       height_unit: 'feet',
       depth_unit: 'feet',
       area_sqft: 0,
-      per_sqft_rate: modularPerSqftRate || 0
+      per_sqft_rate: 0
     };
 
     setQuoteData(prev => ({
       ...prev,
       items: [...prev.items, newItem]
-    }));
-  };
-
-  const updateModularRate = (rate: number) => {
-    setModularPerSqftRate(rate);
-    setQuoteData(prev => ({
-      ...prev,
-      items: prev.items.map(item => {
-        if (item.section !== 'modular') return item;
-        return {
-          ...item,
-          per_sqft_rate: rate,
-          unit_price: rate,
-          amount: computeModularAmount(
-            item.width,
-            item.height,
-            item.number_of_units,
-            rate,
-            item.discount_percent,
-            item.depth
-          )
-        };
-      })
     }));
   };
 
@@ -1141,8 +1117,8 @@ const DesignerQuoteGenerator = () => {
                       onAddItem={handleModularVoiceAdd}
                       onClose={() => setShowModularVoiceInput(false)}
                       presetRates={MODULAR_PRESET_RATES}
-                      currentRate={modularPerSqftRate}
-                      onRateChange={updateModularRate}
+                      currentRate={0}
+                      onRateChange={() => {}}
                     />
                   </div>
                 )}
@@ -1563,41 +1539,8 @@ const DesignerQuoteGenerator = () => {
                       </div>
 
                       <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-                        <label className="block text-sm font-medium text-secondary-800 mb-2">
-                          Rate per sq ft (applies to all modular items)
-                        </label>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {MODULAR_PRESET_RATES.map(rate => (
-                            <button
-                              key={rate}
-                              onClick={() => updateModularRate(rate)}
-                              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                                modularPerSqftRate === rate
-                                  ? 'bg-primary-500 text-white shadow-md'
-                                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                              }`}
-                            >
-                              ₹{rate}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={modularPerSqftRate || ''}
-                              onChange={(e) => updateModularRate(parseFloat(e.target.value) || 0)}
-                              placeholder="or enter custom rate"
-                              className="w-40 pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            />
-                          </div>
-                          <span className="text-sm text-gray-500">per sq ft</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Pick a preset rate or enter a custom value. Each modular item's amount = measurement (W × H × D) × units × rate × (1 - discount%).
+                        <p className="text-sm text-secondary-800">
+                          Set a per sq ft rate for each modular item individually. Different items can have different rates.
                         </p>
                       </div>
 
@@ -1748,6 +1691,46 @@ const DesignerQuoteGenerator = () => {
                                 onChange={(e) => handleItemChange(index, 'discount_percent', parseFloat(e.target.value) || 0)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                               />
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Rate per sq ft (₹) *</label>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              {MODULAR_PRESET_RATES.map(rate => (
+                                <button
+                                  key={rate}
+                                  type="button"
+                                  onClick={() => {
+                                    handleItemChange(index, 'per_sqft_rate', rate);
+                                    handleItemChange(index, 'unit_price', rate);
+                                  }}
+                                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                                    (item.per_sqft_rate ?? 0) === rate
+                                      ? 'bg-primary-500 text-white shadow-md'
+                                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                  }`}
+                                >
+                                  ₹{rate}
+                                </button>
+                              ))}
+                            </div>
+                            <div className="relative inline-block">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={item.per_sqft_rate ?? ''}
+                                onChange={(e) => {
+                                  const rate = parseFloat(e.target.value) || 0;
+                                  handleItemChange(index, 'per_sqft_rate', rate);
+                                  handleItemChange(index, 'unit_price', rate);
+                                }}
+                                placeholder="or enter custom rate"
+                                className="w-40 pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              />
+                              <span className="text-sm text-gray-500 ml-2">per sq ft</span>
                             </div>
                           </div>
 
