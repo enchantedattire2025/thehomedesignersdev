@@ -776,24 +776,28 @@ export default function WallpaperOrder() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium text-gray-700 mb-2">
                   Wallpaper Type <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label className={`relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${formData.wallpaper_type === 'normal' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
-                    <input
-                      type="radio"
-                      name="wallpaper_type"
-                      value="normal"
-                      checked={formData.wallpaper_type === 'normal'}
-                      onChange={(e) => setFormData({ ...formData, wallpaper_type: e.target.value })}
-                      className="mr-3"
-                    />
-                    <div>
-                      <div className="font-semibold text-gray-900">Normal 3D Wallpaper</div>
-                      <div className="text-sm text-gray-600">Rs.160 per sq ft (with installation)</div>
+                  <div 
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className={`relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors                                       ${formData.wallpaper_type === 'normal' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-                                400'}`}>
+                          <input
+                            type="radio"
+                            name="wallpaper_type"
+                            value="normal"
+                            checked={formData.wallpaper_type === 'normal'}
+                            onChange={(e) => setFormData({ ...formData, wallpaper_type: e.target.value })}
+                            className="mr-3"
+                          />
+                          <div>
+                            <div className="font-semibold text-gray-900">Normal 3D Wallpaper</div>
+                            <div className="text-sm text-gray-600">Rs.160 per sq ft (with installation)</div>
+                          </div>
+                      </label>
                     </div>
-                  </label>
+                </div>
 
                   <label className={`relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${formData.wallpaper_type === 'golden_foil' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
                     <input
