@@ -186,24 +186,44 @@ const CustomerQuotes = () => {
       }
       
       // Process quotes from the RPC function
-      const processedQuotes = (quotesData || []).map(quote => {
-        // Parse items if they're in JSON string format
-        let items = quote.items || [];
-        if (typeof items === 'string') {
-          try {
-            items = JSON.parse(items);
-          } catch (e) {
-            console.error('Error parsing items JSON:', e);
-            items = [];
-          }
-        }
-        
-        return {
-          ...quote,
-          items: items
-        };
-      });
-      
+      const processedQuotes = await Promise.all(
+  (quotesData || []).map(async (quote) => {
+    // Parse items if they're in JSON string format
+    let items = quote.items || [];
+
+    if (typeof items === 'string') {
+      try {
+        items = JSON.parse(items);
+      } catch (e) {
+        console.error('Error parsing items JSON:', e);
+        items = [];
+      }
+    }
+
+    // Fetch designer information
+    let designer = null;
+
+    if (quote.designer_id) {
+      const { data: designerData, error: designerError } = await supabase
+        .from('designers')
+        .select('id, name, email, phone, specialization, profile_image')
+        .eq('id', quote.designer_id)
+        .maybeSingle();
+
+      if (designerError) {
+        console.error('Error fetching designer:', designerError);
+      }
+
+      designer = designerData;
+    }
+
+    return {
+      ...quote,
+      designer,
+      items
+    };
+  })
+);
       setAllQuotes(processedQuotes);
 
       // Filter by project if projectId is in URL
@@ -712,7 +732,7 @@ const CustomerQuotes = () => {
 
               <div className="mb-6">
                 <pre className="text-xs bg-gray-100 p-2 rounded">
-                {JSON.stringify(selectedQuote.designer, null, 2)}
+                  {JSON.stringify(selectedQuote.designer, null, 2)}
                 </pre>
                 <h4 className="font-semibold text-secondary-800 mb-3">Designer Information</h4>
                 <div className="flex items-center space-x-3">
@@ -725,7 +745,7 @@ const CustomerQuotes = () => {
                       />
                     ) : (
                       <span className="text-white font-semibold">
-                        {selectedQuote.designer?.name.charAt(0)}
+                        {selectedQuote.designer?.name?.charAt(0) || 'D'}
                       </span>
                     )}
                   </div>
