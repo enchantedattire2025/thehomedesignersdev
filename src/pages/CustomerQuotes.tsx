@@ -731,9 +731,7 @@ const CustomerQuotes = () => {
               </div>
 
               <div className="mb-6">
-                <pre className="text-xs bg-gray-100 p-2 rounded">
-                  {JSON.stringify(selectedQuote.designer, null, 2)}
-                </pre>
+                
                 <h4 className="font-semibold text-secondary-800 mb-3">Designer Information</h4>
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
