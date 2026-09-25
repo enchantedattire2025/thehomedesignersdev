@@ -61,6 +61,7 @@ export default function WallpaperOrder() {
   const paypalButtonsRendered = useRef(false);
   const [nameError, setNameError] = useState('');
   const [wallLengthError, setWallLengthError] = useState('');
+  
 
   const [formData, setFormData] = useState({
     customer_name: '',
