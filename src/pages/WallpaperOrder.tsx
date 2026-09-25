@@ -59,6 +59,7 @@ export default function WallpaperOrder() {
   const [paypalReady, setPaypalReady] = useState(false);
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const paypalButtonsRendered = useRef(false);
+  const [nameError, setNameError] = useState('');
 
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -554,11 +555,23 @@ export default function WallpaperOrder() {
                     required
                     value={formData.customer_name}
                     onChange={(e) => {
-  const value = e.target.value.replace(/[^a-zA-Z\s'-]/g, '');
-  setFormData({ ...formData, customer_name: value });
-}}
+                    const value = e.target.value;
+
+                    if (/[^a-zA-Z\s'-]/.test(value)) {
+                    setNameError("Name can contain only letters.");
+                    return;
+                    }
+
+                    setNameError('');
+                    setFormData({ ...formData, customer_name: value });
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                  {nameError && (
+                  <p className="mt-1 text-sm text-red-500">
+                  {nameError}
+                  </p>
+                  )}
                 </div>
 
                 <div>
