@@ -1,5 +1,6 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { AuthProvider } from './hooks/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import { useDesignerProfile } from './hooks/useDesignerProfile';
 import { detectUserTypeAndRedirect } from './utils/userTypeDetection';
@@ -124,6 +125,7 @@ function App() {
   }, []);
 
   return (
+    <AuthProvider>
     <Router>
       <div className="min-h-screen flex flex-col">
         <DashboardRedirectHandler />
@@ -183,6 +185,7 @@ function App() {
         <InstallPrompt />
       </div>
     </Router>
+    </AuthProvider>
   );
 }
 

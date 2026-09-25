@@ -1,65 +1,84 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
+
+let cachedUserId: string | null = null;
+let cachedHasDesigner = false;
+let cachedHasCustomer = false;
+let cachedPromise: Promise<void> | null = null;
 
 export const useUserRegistrationStatus = () => {
   const { user } = useAuth();
   const [hasDesignerProfile, setHasDesignerProfile] = useState(false);
   const [hasCustomerProject, setHasCustomerProject] = useState(false);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
+
     const checkRegistrationStatus = async () => {
       if (!user) {
+        cachedUserId = null;
+        cachedPromise = null;
+        cachedHasDesigner = false;
+        cachedHasCustomer = false;
         setHasDesignerProfile(false);
         setHasCustomerProject(false);
         setLoading(false);
         return;
       }
 
-      try {
-        setLoading(true);
+      if (cachedUserId === user.id) {
+        setHasDesignerProfile(cachedHasDesigner);
+        setHasCustomerProject(cachedHasCustomer);
+        setLoading(false);
+        return;
+      }
 
-        // Check if user has a designer profile
-        const { data: designerData, error: designerError } = await supabase
+      if (cachedPromise) {
+        await cachedPromise;
+        if (!mountedRef.current) return;
+        setHasDesignerProfile(cachedHasDesigner);
+        setHasCustomerProject(cachedHasCustomer);
+        setLoading(false);
+        return;
+      }
+
+      cachedUserId = user.id;
+
+      cachedPromise = (async () => {
+        const { data: designerData } = await supabase
           .from('designers')
           .select('id')
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (designerError && designerError.code !== 'PGRST116') {
-          console.error('Error checking designer profile:', designerError);
-        }
+        cachedHasDesigner = !!designerData;
 
-        setHasDesignerProfile(!!designerData);
-
-        // Only check customer projects if user is NOT a designer
-        // This prevents unnecessary calls when designers are editing their profiles
         if (!designerData) {
-          const { data: customerData, error: customerError } = await supabase
+          const { data: customerData } = await supabase
             .from('customers')
             .select('id')
             .eq('user_id', user.id)
             .limit(1);
-            //.maybeSingle();
 
-          if (customerError && customerError.code !== 'PGRST116') {
-            console.error('Error checking customer projects:', customerError);
-          }
-
-          setHasCustomerProject(!!customerData);
-        } else { 
-          // User is a designer, so we don't need to check customer projects
-          setHasCustomerProject(false);
+          cachedHasCustomer = !!customerData;
+        } else {
+          cachedHasCustomer = false;
         }
-      } catch (error) {
-        console.error('Error checking registration status:', error);
-      } finally {
-        setLoading(false);
-      }
+      })();
+
+      await cachedPromise;
+      cachedPromise = null;
+      if (!mountedRef.current) return;
+      setHasDesignerProfile(cachedHasDesigner);
+      setHasCustomerProject(cachedHasCustomer);
+      setLoading(false);
     };
 
     checkRegistrationStatus();
+    return () => { mountedRef.current = false; };
   }, [user]);
 
   return {

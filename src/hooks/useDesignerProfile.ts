@@ -1,13 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import type { Designer } from '../lib/supabase';
+
+let cachedDesigner: Designer | null = null;
+let cachedDesignerUserId: string | null = null;
+let cachedDesignerPromise: Promise<void> | null = null;
 
 export const useDesignerProfile = () => {
   const { user, loading: authLoading } = useAuth();
   const [designer, setDesigner] = useState<Designer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
 
   const fetchDesignerProfile = useCallback(async () => {
     if (authLoading) {
@@ -15,72 +20,70 @@ export const useDesignerProfile = () => {
     }
 
     if (!user) {
+      cachedDesigner = null;
+      cachedDesignerUserId = null;
+      cachedDesignerPromise = null;
       setDesigner(null);
       setLoading(false);
       setError(null);
       return;
     }
 
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('Fetching designer profile for user:', user.id, user.email);
-      
-      // Fetch designer data with better error handling
-      const { data, error } = await supabase
-        .from('designers')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        setError(error.message);
-        setDesigner(null);
-      } else {
-        console.log('Designer profile data:', data);
-        setDesigner(data);
-        
-        // Additional logging for debugging
-        if (data) {
-          console.log('Designer found:', {
-            id: data.id,
-            name: data.name,
-            email: data.email,
-            user_id: data.user_id,
-            is_active: data.is_active
-          });
-        } else {
-          console.log('No designer profile found for user');
-        }
-      }
-    } catch (error: any) {
-      console.error('Error fetching designer profile:', error);
-      setError(error.message);
-      setDesigner(null);
-    } finally {
-      // Remove the artificial delay that might be causing issues
+    if (cachedDesignerUserId === user.id && cachedDesignerPromise) {
+      await cachedDesignerPromise;
+      if (!mountedRef.current) return;
+      setDesigner(cachedDesigner);
       setLoading(false);
-    } 
+      return;
+    }
+
+    if (cachedDesignerUserId === user.id) {
+      setDesigner(cachedDesigner);
+      setLoading(false);
+      return;
+    }
+
+    cachedDesignerUserId = user.id;
+    cachedDesigner = null;
+
+    cachedDesignerPromise = (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('designers')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          setError(error.message);
+          cachedDesigner = null;
+        } else {
+          cachedDesigner = data;
+        }
+      } catch (err: any) {
+        setError(err.message);
+        cachedDesigner = null;
+      }
+    })();
+
+    await cachedDesignerPromise;
+    if (!mountedRef.current) return;
+    setDesigner(cachedDesigner);
+    setLoading(false);
   }, [user, authLoading]);
 
   useEffect(() => {
+    mountedRef.current = true;
     fetchDesignerProfile();
+    return () => { mountedRef.current = false; };
   }, [fetchDesignerProfile]);
 
   const updateDesignerProfile = async (updates: Partial<Designer>) => {
     if (!user || !designer) {
-      console.error('Cannot update: missing user or designer', { user: !!user, designer: !!designer });
       return { error: 'No designer profile found or user not authenticated' };
     }
 
     try {
-      console.log('Updating designer profile with:', updates);
-      console.log('Current designer ID:', designer.id);
-      console.log('Current user ID:', user.id);
-      
-      // First, let's verify the designer exists and belongs to the current user
       const { data: existingDesigner, error: checkError } = await supabase
         .from('designers')
         .select('*')
@@ -89,18 +92,13 @@ export const useDesignerProfile = () => {
         .single();
 
       if (checkError) {
-        console.error('Error verifying designer ownership:', checkError);
         return { error: 'Cannot verify designer ownership: ' + checkError.message };
       }
 
       if (!existingDesigner) {
-        console.error('Designer not found or does not belong to current user');
         return { error: 'Designer profile not found or access denied' };
       }
 
-      console.log('Designer ownership verified, proceeding with update');
-
-      // Perform the update using the designer ID (more reliable than user_id)
       const { data, error } = await supabase
         .from('designers')
         .update(updates)
@@ -109,17 +107,13 @@ export const useDesignerProfile = () => {
         .single();
 
       if (error) {
-        console.error('Update error:', error);
         throw error;
       }
 
-      console.log('Profile updated successfully:', data);
-      
-      // Update local state with new data
+      cachedDesigner = data;
       setDesigner(data);
       return { error: null, data };
     } catch (error: any) {
-      console.error('Error updating designer profile:', error);
       return { error: error.message };
     }
   };
@@ -130,9 +124,6 @@ export const useDesignerProfile = () => {
     }
 
     try {
-      console.log('Creating new designer profile for user:', user.id);
-      
-      // Check if designer profile already exists
       const { data: existingDesigner } = await supabase
         .from('designers')
         .select('id')
@@ -155,17 +146,14 @@ export const useDesignerProfile = () => {
         .single();
 
       if (error) {
-        console.error('Create error:', error);
         throw error;
       }
 
-      console.log('Designer profile created successfully:', data);
-      
-      // Update local state with new data
+      cachedDesigner = data;
+      cachedDesignerUserId = user.id;
       setDesigner(data);
       return { error: null, data };
     } catch (error: any) {
-      console.error('Error creating designer profile:', error);
       return { error: error.message };
     }
   };
