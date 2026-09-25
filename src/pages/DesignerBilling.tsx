@@ -894,6 +894,7 @@ const DesignerBilling = () => {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Add any notes for the customer..."
                 rows={4}
+                maxlength={500}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-teal-500 focus:border-teal-500 resize-none"
               />
             )}
