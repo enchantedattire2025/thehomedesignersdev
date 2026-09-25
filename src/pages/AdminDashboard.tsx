@@ -1140,7 +1140,154 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
-        )}
+        )}{editingDesigner && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+
+      {/* Modal Header */}
+      <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div>
+          <h2 className="text-xl font-bold text-secondary-800">
+            Edit Designer
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Update designer information
+          </p>
+        </div>
+
+        <button
+          onClick={() => setEditingDesigner(null)}
+          className="text-gray-500 hover:text-gray-700 text-2xl"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Form */}
+      <div className="p-6 space-y-5">
+
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Designer Name
+          </label>
+
+          <input
+            type="text"
+            value={editingDesigner.name}
+            onChange={(e) =>
+              setEditingDesigner({
+                ...editingDesigner,
+                name: e.target.value
+              })
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+
+          <input
+            type="email"
+            value={editingDesigner.email}
+            onChange={(e) =>
+              setEditingDesigner({
+                ...editingDesigner,
+                email: e.target.value
+              })
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Specialization */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Specialization
+          </label>
+
+          <input
+            type="text"
+            value={editingDesigner.specialization}
+            onChange={(e) =>
+              setEditingDesigner({
+                ...editingDesigner,
+                specialization: e.target.value
+              })
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Location */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Location
+          </label>
+
+          <input
+            type="text"
+            value={editingDesigner.location}
+            onChange={(e) =>
+              setEditingDesigner({
+                ...editingDesigner,
+                location: e.target.value
+              })
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Experience */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Experience (Years)
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            value={editingDesigner.experience}
+            onChange={(e) =>
+              setEditingDesigner({
+                ...editingDesigner,
+                experience: Number(e.target.value)
+              })
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
+
+        <button
+          onClick={() => setEditingDesigner(null)}
+          disabled={savingDesigner}
+          className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleSaveDesigner}
+          disabled={savingDesigner}
+          className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+        >
+          {savingDesigner ? 'Saving...' : 'Save Changes'}
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
