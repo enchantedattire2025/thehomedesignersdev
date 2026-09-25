@@ -732,32 +732,32 @@ export default function WallpaperOrder() {
                     </p>
                   )}
                 </div>
-              </div>
+              
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Wall Height <span className="text-red-500">*</span>
                   </label>
                   <input
-  type="text"
-  inputMode="decimal"
-  required
-  value={formData.wall_size_height}
-  onChange={(e) => {
-    const value = e.target.value;
-
-    if (
-      /^\d*\.?\d{0,2}$/.test(value) &&
-      value.replace('.', '').length <= 15
-    ) {
-      setFormData({
-        ...formData,
-        wall_size_height: value
-      });
-    }
-  }}
-  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-/>
+                  type="text"
+                  inputMode="decimal"
+                  required
+                  value={formData.wall_size_height}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                
+                    if (
+                      /^\d*\.?\d{0,2}$/.test(value) &&
+                      value.replace('.', '').length <= 15
+                    ) {
+                      setFormData({
+                        ...formData,
+                        wall_size_height: value
+                      });
+                    }
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
                 </div>
 
                 <div>
