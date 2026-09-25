@@ -880,37 +880,46 @@ const DesignerBilling = () => {
             </table>
           </div>
         </div>
+{/* Totals & Notes */}
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Totals & Notes */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Notes */}
-          <div className="bg-white rounded-xl shadow-sm border p-5">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Notes</h3>
-            {viewingVersion ? (
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{displayNotes || 'No notes'}</p>
-            ) : (
-              <div>
-  <textarea
-    value={notes}
-    onChange={(e) => setNotes(e.target.value)}
-    placeholder="Add any notes for the customer..."
-    rows={4}
-    maxLength={500}
-    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-teal-500 focus:border-teal-500 resize-none"
-  />
+  {/* Notes */}
+  <div className="bg-white rounded-xl shadow-sm border p-5">
+    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+      Notes
+    </h3>
 
-  <div className="flex justify-between items-center mt-1">
-    <p className="text-xs text-gray-500">
-      Maximum 500 characters
-    </p>
+    {viewingVersion ? (
+      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+        {displayNotes || 'No notes'}
+      </p>
+    ) : (
+      <div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Add any notes for the customer..."
+          rows={4}
+          maxLength={500}
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-teal-500 focus:border-teal-500 resize-none"
+        />
 
-    <p className={`text-xs ${
-      notes.length >= 500 ? 'text-red-500' : 'text-gray-500'
-    }`}>
-      {notes.length}/500
-    </p>
+        <div className="flex justify-between items-center mt-1">
+          <p className="text-xs text-gray-500">
+            Maximum 500 characters
+          </p>
+
+          <p
+            className={`text-xs ${
+              notes.length >= 500 ? 'text-red-500' : 'text-gray-500'
+            }`}
+          >
+            {notes.length}/500
+          </p>
+        </div>
+      </div>
+    )}
   </div>
-</div>
 
           {/* Summary */}
           <div className="bg-white rounded-xl shadow-sm border p-5">
