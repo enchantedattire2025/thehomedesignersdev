@@ -695,52 +695,55 @@ export default function WallpaperOrder() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Wall Length <span className="text-red-500">*</span>
-                  </label>
-              
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    required
-                    value={formData.wall_size_length}
-                    onChange={(e) => {
-                      const value = e.target.value;
-              
-                      if (!/^\d*\.?\d{0,2}$/.test(value)) {
-                        setWallLengthError('Wall Length must contain numbers only.');
-                        return;
-                      }
-              
-                      if (value.replace('.', '').length > 15) {
-                        setWallLengthError('Wall Length cannot exceed 15 digits.');
-                        return;
-                      }
-              
-                      setWallLengthError('');
-              
-                      setFormData({
-                        ...formData,
-                        wall_size_length: value
-                      });
-                    }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-              
-                  {wallLengthError && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {wallLengthError}
-                    </p>
-                  )}
-                </div>
-              
-
-                <div>
+            
+              {/* Wall Length */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Wall Length <span className="text-red-500">*</span>
+                </label>
+            
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  required
+                  value={formData.wall_size_length}
+                  onChange={(e) => {
+                    const value = e.target.value;
+            
+                    if (!/^\d*\.?\d{0,2}$/.test(value)) {
+                      setWallLengthError('Wall Length must contain numbers only.');
+                      return;
+                    }
+            
+                    if (value.replace('.', '').length > 15) {
+                      setWallLengthError('Wall Length cannot exceed 15 digits.');
+                      return;
+                    }
+            
+                    setWallLengthError('');
+            
+                    setFormData({
+                      ...formData,
+                      wall_size_length: value
+                    });
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+            
+                {wallLengthError && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {wallLengthError}
+                  </p>
+                )}
+              </div>
+            
+            
+              {/* Wall Height */}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Wall Height <span className="text-red-500">*</span>
                 </label>
-              
+            
                 <input
                   type="text"
                   inputMode="decimal"
@@ -748,19 +751,19 @@ export default function WallpaperOrder() {
                   value={formData.wall_size_height}
                   onChange={(e) => {
                     const value = e.target.value;
-              
+            
                     if (!/^\d*\.?\d{0,2}$/.test(value)) {
                       setWallHeightError('Wall Height must contain numbers only.');
                       return;
                     }
-              
+            
                     if (value.replace('.', '').length > 15) {
                       setWallHeightError('Wall Height cannot exceed 15 digits.');
                       return;
                     }
-              
+            
                     setWallHeightError('');
-              
+            
                     setFormData({
                       ...formData,
                       wall_size_height: value
@@ -768,15 +771,41 @@ export default function WallpaperOrder() {
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-              
+            
                 {wallHeightError && (
                   <p className="mt-1 text-sm text-red-500">
                     {wallHeightError}
                   </p>
                 )}
               </div>
-
+            
+            
+              {/* Unit */}
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Unit <span className="text-red-500">*</span>
+                </label>
+            
+                <select
+                  value={formData.wall_unit}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      wall_unit: e.target.value
+                    })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="feet">Feet</option>
+                  <option value="inches">Inches</option>
+                </select>
+              </div>
+            
+            </div>
+            
+            
+            {/* Wallpaper Type */}
+            <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Wallpaper Type <span className="text-red-500">*</span>
               </label>
@@ -809,11 +838,13 @@ export default function WallpaperOrder() {
                     <div className="font-semibold text-gray-900">
                       Normal 3D Wallpaper
                     </div>
+            
                     <div className="text-sm text-gray-600">
                       Rs.160 per sq ft (with installation)
                     </div>
                   </div>
                 </label>
+            
             
                 {/* Golden/Silver Foil 3D Wallpaper */}
                 <label
@@ -841,6 +872,7 @@ export default function WallpaperOrder() {
                     <div className="font-semibold text-gray-900">
                       Golden/Silver Foil 3D Wallpaper
                     </div>
+            
                     <div className="text-sm text-gray-600">
                       Rs.220 per sq ft (with installation)
                     </div>
