@@ -879,12 +879,14 @@ export default function WallpaperOrder() {
                   </div>
                 </label>
             
-              </div>
+                            </div>
             </div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reference Image (Pinterest/Shutterstock URLs)
-                  {isCustomOrder && <span className="text-red-500 ml-1">*</span>}
-                </label>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reference Image (Pinterest/Shutterstock URLs)
+                {isCustomOrder && <span className="text-red-500 ml-1">*</span>}
+              </label>
                 {formData.reference_images.map((img, index) => (
                   <div key={index} className="flex gap-2 mb-2">
                     <input
