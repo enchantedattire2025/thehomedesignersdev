@@ -918,18 +918,40 @@ export default function WallpaperOrder() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Notes
-                </label>
-                <textarea
-                  rows={3}
-                  maxLength={500}
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Any special requirements or instructions..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Additional Notes
+              </label>
+            
+              <textarea
+                rows={3}
+                maxLength={500}
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    notes: e.target.value
+                  })
+                }
+                placeholder="Any special requirements or instructions..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-xs text-gray-500">
+                  Maximum 500 characters
+                </p>
+            
+                <p
+                  className={`text-xs ${
+                    formData.notes.length >= 500
+                      ? 'text-red-500'
+                      : 'text-gray-500'
+                  }`}
+                >
+                  {formData.notes.length}/500
+                </p>
               </div>
+            </div>
 
               {areaSqFt > 0 && (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
