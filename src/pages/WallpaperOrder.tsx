@@ -815,7 +815,7 @@ export default function WallpaperOrder() {
                   </label>
                 </div>
               </div>
-
+            </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Reference Image (Pinterest/Shutterstock URLs)
