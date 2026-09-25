@@ -81,6 +81,8 @@ const AdminDashboard = () => {
   const [earnings, setEarnings] = useState<DesignerEarning[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingDesigner, setEditingDesigner] = useState<Designer | null>(null);
+  const [savingDesigner, setSavingDesigner] = useState(false);
   const [subscriptionManagementEnabled, setSubscriptionManagementEnabled] = useState(false);
   const [updatingSettings, setUpdatingSettings] = useState(false);
 
@@ -292,6 +294,41 @@ const AdminDashboard = () => {
   };
 
   const handleToggleDesignerStatus = async (designerId: string, active: boolean) => {
+          const handleSaveDesigner = async () => {
+        if (!editingDesigner) return;
+
+        try {
+          setSavingDesigner(true);
+      
+          const { error } = await supabase
+            .from('designers')
+            .update({
+              name: editingDesigner.name,
+              email: editingDesigner.email,
+              specialization: editingDesigner.specialization,
+              location: editingDesigner.location,
+              experience: editingDesigner.experience
+            })
+            .eq('id', editingDesigner.id);
+      
+          if (error) throw error;
+      
+          setDesigners(prev =>
+            prev.map(d =>
+              d.id === editingDesigner.id ? editingDesigner : d
+            )
+          );
+      
+          setEditingDesigner(null);
+      
+          alert('Designer updated successfully!');
+        } catch (error) {
+          console.error('Error updating designer:', error);
+          alert('Failed to update designer. Please try again.');
+        } finally {
+          setSavingDesigner(false);
+        }
+      };
     try {
       const { error } = await supabase
         .from('designers')
@@ -759,6 +796,7 @@ const AdminDashboard = () => {
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => setEditingDesigner({ ...designer })}
                               className="p-2 bg-primary-100 text-primary-600 hover:bg-primary-200 rounded-lg transition-colors"
                               title="Edit"
                             >
