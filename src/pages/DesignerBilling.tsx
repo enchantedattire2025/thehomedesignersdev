@@ -97,6 +97,7 @@ const DesignerBilling = () => {
 
   const [bill, setBill] = useState<Bill | null>(null);
   const [items, setItems] = useState<BillItem[]>([]);
+  const [initialItems, setInitialItems] = useState<BillItem[]>([]);
   const [project, setProject] = useState<ProjectInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
