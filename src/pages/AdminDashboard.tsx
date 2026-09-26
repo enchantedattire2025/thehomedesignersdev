@@ -896,9 +896,7 @@ const handleSaveDesigner = async () => {
 
     {/* Edit Button */}
     <button
-      onClick={() => {
-        console.log("Edit customer:", customer);
-      }}
+      onClick={() => handleEditCustomer(customer)}
       className="p-2 bg-secondary-100 text-secondary-600 hover:bg-secondary-200 rounded-lg transition-colors"
       title="Edit"
     >
