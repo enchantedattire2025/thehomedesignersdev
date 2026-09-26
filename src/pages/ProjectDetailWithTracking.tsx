@@ -34,14 +34,6 @@ const ProjectDetailWithTracking = () => {
   const [acceptedQuote, setAcceptedQuote] = useState<any>(null);
   const [quoteItems, setQuoteItems] = useState<any[]>([]);
 
-  // Refs to hold latest auth/designer values without triggering re-fetches
-  const userRef = useRef(user);
-  const designerRef = useRef(designer);
-  const designerLoadingRef = useRef(designerLoading);
-  userRef.current = user;
-  designerRef.current = designer;
-  designerLoadingRef.current = designerLoading;
-
   // Check if there's a tab parameter in the URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,18 +43,19 @@ const ProjectDetailWithTracking = () => {
     }
   }, []);
 
-  // Only re-fetch when the project ID changes or refreshKey is explicitly bumped.
-  // Auth state refreshes (e.g. from browser tab switches) update user/designer
-  // object references but should NOT trigger a full project reload.
+  // Re-fetch only when the project ID changes, refreshKey is bumped,
+  // or auth state transitions (user?.id changes from null to a real ID,
+  // designerLoading flips). Using user?.id (a string primitive) instead of
+  // user (an object reference) prevents re-fetches from spurious auth
+  // refreshes triggered by browser tab switches.
   useEffect(() => {
-    if (id && userRef.current && !designerLoadingRef.current) {
+    if (id && user && !designerLoading) {
       fetchProject();
     }
-  }, [id, refreshKey]);
+  }, [id, user?.id, designerLoading, refreshKey]);
 
   const fetchProject = async () => {
-    const currentUser = userRef.current;
-    if (!id || !currentUser) return;
+    if (!id || !user) return;
 
     try {
       setLoading(true);
