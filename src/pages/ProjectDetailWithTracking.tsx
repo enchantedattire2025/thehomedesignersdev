@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CreditCard as Edit, UserPlus, Clock, MapPin, IndianRupee as Rupee, User, Phone, Mail, AlertCircle, Compass, Camera, RefreshCw, FileText, CheckCircle, Calendar, Package } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -34,6 +34,14 @@ const ProjectDetailWithTracking = () => {
   const [acceptedQuote, setAcceptedQuote] = useState<any>(null);
   const [quoteItems, setQuoteItems] = useState<any[]>([]);
 
+  // Refs to hold latest auth/designer values without triggering re-fetches
+  const userRef = useRef(user);
+  const designerRef = useRef(designer);
+  const designerLoadingRef = useRef(designerLoading);
+  userRef.current = user;
+  designerRef.current = designer;
+  designerLoadingRef.current = designerLoading;
+
   // Check if there's a tab parameter in the URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -43,21 +51,22 @@ const ProjectDetailWithTracking = () => {
     }
   }, []);
 
+  // Only re-fetch when the project ID changes or refreshKey is explicitly bumped.
+  // Auth state refreshes (e.g. from browser tab switches) update user/designer
+  // object references but should NOT trigger a full project reload.
   useEffect(() => {
-    if (id && user && !designerLoading && refreshKey >= 0) {
+    if (id && userRef.current && !designerLoadingRef.current) {
       fetchProject();
     }
-  }, [id, user, designerLoading, isDesigner, designer, refreshKey]);
+  }, [id, refreshKey]);
 
   const fetchProject = async () => {
-    if (!id || !user) return;
+    const currentUser = userRef.current;
+    if (!id || !currentUser) return;
 
     try {
       setLoading(true);
       setError(null);
-
-      console.log('Fetching project with ID:', id);
-      console.log('User info:', { userId: user.id, isDesigner, designerId: designer?.id });
 
       // Build query that works with RLS policies
       let query = supabase
@@ -74,8 +83,6 @@ const ProjectDetailWithTracking = () => {
       // So we don't need to add additional filters here
 
       const { data, error } = await query.maybeSingle();
-
-      console.log('Query result:', { data, error });
 
       if (error) {
         console.error('Database error:', error);
