@@ -502,49 +502,8 @@ const BillDashboard = () => {
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            /*{/* Context menu */}
-                            <div className="relative">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === bill.id ? null : bill.id); }}
-                                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <MoreVertical className="w-4 h-4" />
-                              </button>
-                              {openMenuId === bill.id && (
-                                <div
-                                  className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border z-50"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div className="py-1">
-                                    <p className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Mark as</p>
-                                    {(['draft', 'sent', 'paid', 'partially_paid'] as const).map((s) => (
-                                      <button
-                                        key={s}
-                                        onClick={(e) => handleMarkStatus(bill.id, s, e)}
-                                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${bill.status === s ? 'font-semibold text-teal-700' : 'text-gray-700'}`}
-                                      >
-                                        {STATUS_CONFIG[s]?.label}
-                                        {bill.status === s && <span className="ml-1 text-teal-500">✓</span>}
-                                      </button>
-                                    ))}
-                                    <div className="border-t my-1" />
-                                    <button
-                                      onClick={(e) => handleDelete(bill.id, e)}
-                                      disabled={deletingId === bill.id}
-                                      className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
-                                    >
-                                      {deletingId === bill.id ? (
-                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      )}
-                                      Delete Bill
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>*/
-                          </div>
+                            {/* Context menu */}
+                            
                         </div>
                       </div>
                     </div>
