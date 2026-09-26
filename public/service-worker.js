@@ -1,19 +1,17 @@
-const CACHE_NAME = 'interior-design-v3';
-const urlsToCache = [
+const CACHE_VERSION = 'interior-design-v4';
+const CACHE_NAME = `${CACHE_VERSION}-${self.registration.scope}`;
+const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.svg'
 ];
 
-// Install event - cache essential resources
+// Install event - precache essential static assets only
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+      .then((cache) => cache.addAll(PRECACHE_URLS))
       .catch((error) => {
         console.error('Cache installation failed:', error);
       })
@@ -21,64 +19,111 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - purge ALL old caches and stale entries
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME) {
+              console.log('Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+            return undefined;
+          })
+        );
+      })
+      .then(() => {
+        // Clean up stale entries from current cache (e.g. old hashed JS bundles)
+        return caches.open(CACHE_NAME).then((cache) => {
+          return cache.keys().then((requests) => {
+            return Promise.all(
+              requests.map((request) => {
+                // Only keep precache URLs; remove everything else (dynamic fetches)
+                const url = new URL(request.url);
+                const isPrecache = PRECACHE_URLS.some(
+                  (path) => url.pathname === path
+                );
+                if (!isPrecache) {
+                  return cache.delete(request);
+                }
+                return undefined;
+              })
+            );
+          });
+        });
+      })
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch event - network first, fall back to cache
+// Fetch event strategy:
+// - Navigation requests: network-first (so new deploys always show), cache fallback offline
+// - Static assets (JS/CSS/images): cache-first with network update (immutable hashed files)
+// - Everything else: network, no caching
 self.addEventListener('fetch', (event) => {
+  const request = event.request;
+
   // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
+  if (!request.url.startsWith(self.location.origin)) {
     return;
   }
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Don't cache non-successful responses
-        if (!response || response.status !== 200 || response.type === 'error') {
+  // Navigation requests: network-first so new deploys are always served
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseToCache);
+            });
+          }
           return response;
-        }
-
-        // Clone the response
-        const responseToCache = response.clone();
-
-        // Cache successful responses
-        caches.open(CACHE_NAME)
-          .then((cache) => {
-            cache.put(event.request, responseToCache);
+        })
+        .catch(() => {
+          return caches.match(request).then((response) => {
+            return response || caches.match('/index.html');
           });
+        })
+    );
+    return;
+  }
 
-        return response;
-      })
-      .catch(() => {
-        // Network failed, try cache
-        return caches.match(event.request)
+  // Static assets with hashes (JS, CSS, fonts, images): stale-while-revalidate
+  const url = new URL(request.url);
+  const isImmutableAsset =
+    url.pathname.startsWith('/assets/') ||
+    /\.(?:js|css|woff2?|ttf|png|jpg|jpeg|gif|svg|webp|ico)$/i.test(url.pathname);
+
+  if (request.method === 'GET' && isImmutableAsset) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const networkFetch = fetch(request)
           .then((response) => {
-            if (response) {
-              return response;
+            if (response && response.status === 200) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(request, responseToCache);
+              });
             }
-
-            // Return a custom offline page for navigation requests
-            if (event.request.mode === 'navigate') {
-              return caches.match('/index.html');
-            }
-          });
+            return response;
+          })
+          .catch(() => cached);
+        return cached || networkFetch;
       })
-  );
+    );
+    return;
+  }
+
+  // All other same-origin GET requests: network-first, no caching
+  if (request.method === 'GET') {
+    event.respondWith(
+      fetch(request).catch(() => caches.match(request))
+    );
+  }
 });
 
 // Handle messages from the client
