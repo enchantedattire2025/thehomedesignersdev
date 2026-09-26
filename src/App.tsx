@@ -43,7 +43,6 @@ const DebugPage = lazy(() => import('./pages/DebugPage'));
 const DebugDesignerProfile = lazy(() => import('./pages/DebugDesignerProfile'));
 const SharePhotoForm = lazy(() => import('./pages/SharePhotoForm'));
 const ClearSession = lazy(() => import('./pages/ClearSession'));
-const DesignTool = lazy(() => import('./pages/DesignTool'));
 const EmailConfirmation = lazy(() => import('./pages/EmailConfirmation'));
 const WallpaperOrder = lazy(() => import('./pages/WallpaperOrder'));
 const WallpaperGallery = lazy(() => import('./pages/WallpaperGallery'));
@@ -167,7 +166,6 @@ function App() {
             <Route path="/debug-profile" element={<DebugDesignerProfile />} />
             <Route path="/share-photo" element={<SharePhotoForm />} />
             <Route path="/clear-session" element={<ClearSession />} />
-            <Route path="/design-tool" element={<DesignTool />} />
             <Route path="/wallpaper-gallery" element={<WallpaperGallery />} />
             <Route path="/wallpaper-order" element={<WallpaperOrder />} />
             <Route path="/my-3d-wallpaper-orders" element={<My3DWallpaperOrders />} />
