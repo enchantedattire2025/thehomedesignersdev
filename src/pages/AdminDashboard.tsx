@@ -881,21 +881,32 @@ const handleSaveDesigner = async () => {
                           {new Date(customer.created_at).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-6">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              className="p-2 bg-primary-100 text-primary-600 hover:bg-primary-200 rounded-lg transition-colors"
-                              title="View"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              className="p-2 bg-secondary-100 text-secondary-600 hover:bg-secondary-200 rounded-lg transition-colors"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
+  <div className="flex items-center space-x-2">
+
+    {/* View Button */}
+    <button
+      onClick={() => {
+        console.log("View customer:", customer);
+      }}
+      className="p-2 bg-primary-100 text-primary-600 hover:bg-primary-200 rounded-lg transition-colors"
+      title="View"
+    >
+      <Eye className="w-4 h-4" />
+    </button>
+
+    {/* Edit Button */}
+    <button
+      onClick={() => {
+        console.log("Edit customer:", customer);
+      }}
+      className="p-2 bg-secondary-100 text-secondary-600 hover:bg-secondary-200 rounded-lg transition-colors"
+      title="Edit"
+    >
+      <Edit className="w-4 h-4" />
+    </button>
+
+  </div>
+</td>
                       </tr>
                     ))}
                   </tbody>
