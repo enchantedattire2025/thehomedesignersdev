@@ -36,8 +36,10 @@ interface Designer {
 
 interface Customer {
   id: string;
+  user_id?: string;
   name: string;
   email: string;
+  phone?: string;
   location: string;
   project_name: string;
   budget_range: string;
