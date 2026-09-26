@@ -1156,368 +1156,295 @@ const DesignerQuoteGenerator = () => {
                         <h3 className="text-lg font-semibold text-secondary-800">On-Site Work</h3>
                         <span className="text-sm text-gray-500">(materials from material list)</span>
                       </div>
+                    <div className="overflow-x-auto rounded-lg border border-gray-200">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">#</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Item Type</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Material / Component</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Item Name *</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Description</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">No. of Units</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Total Measurement</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Unit</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Width</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Height</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Depth</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Unit Price (₹)</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Discount (%)</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Amount</th>
+                            <th className="px-3 py-2.5"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
                     {quoteData.items.map((item, index) => item.section === 'modular' ? null : (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="font-medium text-secondary-800">Item #{index + 1}</h3>
-                          <button
-                            onClick={() => removeItem(index)}
-                            className="text-red-500 hover:text-red-600"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Item Type
-                            </label>
-                            <select
-                              value={item.item_type}
-                              onChange={(e) => handleItemChange(index, 'item_type', e.target.value)}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            >
-                              <option value="material">Material</option>
-                              <option value="labor">Labor</option>
-                              <option value="service">Service</option>
-                              <option value="component">Component</option>
-                              <option value="other">Other</option>
-                            </select>
-                          </div>
-                          
-                          {item.item_type === 'material' && (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Select Material
-                              </label>
+                          <tr key={index} className="border-b border-gray-100 hover:bg-gray-50/50 align-top">
+                            <td className="px-3 py-2.5 text-gray-500 font-medium whitespace-nowrap">{index + 1}</td>
+                            <td className="px-3 py-2.5">
                               <select
-                                value={item.material_id || ''}
-                                onChange={(e) => handleItemChange(index, 'material_id', e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                value={item.item_type}
+                                onChange={(e) => handleItemChange(index, 'item_type', e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                               >
-                                <option value="">Select a material</option>
-                                {materials.map(material => (
-                                  <option key={material.id} value={material.id}>
-                                    {material.name} ({material.category}) - {formatCurrency(material.is_discounted && material.discount_price !== null ? material.discount_price : material.base_price)}/{material.unit}
-                                  </option>
-                                ))}
+                                <option value="material">Material</option>
+                                <option value="labor">Labor</option>
+                                <option value="service">Service</option>
+                                <option value="component">Component</option>
+                                <option value="other">Other</option>
                               </select>
-                            </div>
-                          )}
-
-                          {item.item_type === 'component' && (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Select Component Type
-                              </label>
-                              <select
-                                value={item.name || ''}
-                                onChange={(e) => {
-                                  const selectedComponent = componentTypes.find(c => c.name === e.target.value);
-                                  if (selectedComponent) {
-                                    handleItemChange(index, 'name', selectedComponent.name);
-                                    handleItemChange(index, 'description', selectedComponent.description);
-                                    handleItemChange(index, 'unit', selectedComponent.defaultUnit);
-                                    handleItemChange(index, 'unit_price', selectedComponent.defaultPrice);
-                                    // Recalculate amount
-                                    const amount = item.number_of_units * item.quantity * selectedComponent.defaultPrice * (1 - (item.discount_percent / 100));
-                                    handleItemChange(index, 'amount', amount);
-                                  }
-                                }}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              >
-                                <option value="">Select a component</option>
-                                {componentTypes.map(component => (
-                                  <option key={component.id} value={component.name}>
-                                    {component.name} - {formatCurrency(component.defaultPrice)}/{component.defaultUnit}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
-                          
-                          <div className={item.item_type === 'material' ? 'md:col-span-2' : ''}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Item Name *
-                            </label>
-                            <input
-                              type="text"
-                              value={item.name}
-                              onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="e.g., Italian Marble, Design Consultation"
-                              required
-                            />
-                            {item.item_type === 'component' && (
-                              <div className="mt-2 grid grid-cols-2 gap-2">
-                                <div>
-                                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                                    Width (ft)
-                                  </label>
-                                  <input
-                                    type="number"
-                                    value={item.description.includes('Width:') ? 
-                                      parseFloat(item.description.match(/Width: (\d+(\.\d+)?)ft/)?.[1] || '0') : 
-                                      ''}
-                                    onChange={(e) => {
-                                      const width = parseFloat(e.target.value) || 0;
-                                      const heightMatch = item.description.match(/Height: (\d+(\.\d+)?)ft/);
-                                      const height = heightMatch ? parseFloat(heightMatch[1]) : 0;
-                                      const depthMatch = item.description.match(/Depth: (\d+(\.\d+)?)ft/);
-                                      const depth = depthMatch ? parseFloat(depthMatch[1]) : 0;
-                                      
-                                      const newDescription = `Width: ${width}ft, Height: ${height}ft, Depth: ${depth}ft`;
-                                      handleItemChange(index, 'description', newDescription);
-                                      
-                                      // If this is a square footage based component, update quantity
-                                      if (item.unit === 'sq.ft') {
-                                        const newQuantity = width * height;
-                                        handleItemChange(index, 'quantity', newQuantity);
-                                        // Update amount
-                                        const amount = item.number_of_units * newQuantity * item.unit_price * (1 - (item.discount_percent / 100));
-                                        handleItemChange(index, 'amount', amount);
-                                      }
-                                    }}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                                    Height (ft)
-                                  </label>
-                                  <input
-                                    type="number"
-                                    value={item.description.includes('Height:') ? 
-                                      parseFloat(item.description.match(/Height: (\d+(\.\d+)?)ft/)?.[1] || '0') : 
-                                      ''}
-                                    onChange={(e) => {
-                                      const height = parseFloat(e.target.value) || 0;
-                                      const widthMatch = item.description.match(/Width: (\d+(\.\d+)?)ft/);
-                                      const width = widthMatch ? parseFloat(widthMatch[1]) : 0;
-                                      const depthMatch = item.description.match(/Depth: (\d+(\.\d+)?)ft/);
-                                      const depth = depthMatch ? parseFloat(depthMatch[1]) : 0;
-                                      
-                                      const newDescription = `Width: ${width}ft, Height: ${height}ft, Depth: ${depth}ft`;
-                                      handleItemChange(index, 'description', newDescription);
-                                      
-                                      // If this is a square footage based component, update quantity
-                                      if (item.unit === 'sq.ft') {
-                                        const newQuantity = width * height;
-                                        handleItemChange(index, 'quantity', newQuantity);
-                                        // Update amount
-                                        const amount = item.number_of_units * newQuantity * item.unit_price * (1 - (item.discount_percent / 100));
-                                        handleItemChange(index, 'amount', amount);
-                                      }
-                                    }}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                                    Depth (ft)
-                                  </label>
-                                  <input
-                                    type="number"
-                                    value={item.description.includes('Depth:') ? 
-                                      parseFloat(item.description.match(/Depth: (\d+(\.\d+)?)ft/)?.[1] || '0') : 
-                                      ''}
-                                    onChange={(e) => {
-                                      const depth = parseFloat(e.target.value) || 0;
-                                      const widthMatch = item.description.match(/Width: (\d+(\.\d+)?)ft/);
-                                      const width = widthMatch ? parseFloat(widthMatch[1]) : 0;
-                                      const heightMatch = item.description.match(/Height: (\d+(\.\d+)?)ft/);
-                                      const height = heightMatch ? parseFloat(heightMatch[1]) : 0;
-                                      
-                                      const newDescription = `Width: ${width}ft, Height: ${height}ft, Depth: ${depth}ft`;
-                                      handleItemChange(index, 'description', newDescription);
-                                    }}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                                    Calculated Area
-                                  </label>
-                                  <div className="w-full border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-gray-700">
-                                    {item.quantity.toFixed(2)} {item.unit}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              {item.item_type === 'material' && (
+                                <select
+                                  value={item.material_id || ''}
+                                  onChange={(e) => handleItemChange(index, 'material_id', e.target.value)}
+                                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[140px]"
+                                >
+                                  <option value="">Select a material</option>
+                                  {materials.map(material => (
+                                    <option key={material.id} value={material.id}>
+                                      {material.name} ({material.category}) - {formatCurrency(material.is_discounted && material.discount_price !== null ? material.discount_price : material.base_price)}/{material.unit}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                              {item.item_type === 'component' && (
+                                <select
+                                  value={item.name || ''}
+                                  onChange={(e) => {
+                                    const selectedComponent = componentTypes.find(c => c.name === e.target.value);
+                                    if (selectedComponent) {
+                                      handleItemChange(index, 'name', selectedComponent.name);
+                                      handleItemChange(index, 'description', selectedComponent.description);
+                                      handleItemChange(index, 'unit', selectedComponent.defaultUnit);
+                                      handleItemChange(index, 'unit_price', selectedComponent.defaultPrice);
+                                      const amount = item.number_of_units * item.quantity * selectedComponent.defaultPrice * (1 - (item.discount_percent / 100));
+                                      handleItemChange(index, 'amount', amount);
+                                    }
+                                  }}
+                                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[140px]"
+                                >
+                                  <option value="">Select a component</option>
+                                  {componentTypes.map(component => (
+                                    <option key={component.id} value={component.name}>
+                                      {component.name} - {formatCurrency(component.defaultPrice)}/{component.defaultUnit}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                              {item.item_type !== 'material' && item.item_type !== 'component' && (
+                                <span className="text-gray-400 text-xs">—</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="text"
+                                value={item.name}
+                                onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[120px]"
+                                placeholder="e.g., Italian Marble"
+                                required
+                              />
+                              {item.item_type === 'component' && (
+                                <div className="mt-1.5 flex gap-1.5 flex-wrap">
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] text-gray-500 mb-0.5">W (ft)</span>
+                                    <input
+                                      type="number"
+                                      value={item.description.includes('Width:') ? parseFloat(item.description.match(/Width: (\d+(\.\d+)?)ft/)?.[1] || '0') : ''}
+                                      onChange={(e) => {
+                                        const width = parseFloat(e.target.value) || 0;
+                                        const heightMatch = item.description.match(/Height: (\d+(\.\d+)?)ft/);
+                                        const height = heightMatch ? parseFloat(heightMatch[1]) : 0;
+                                        const depthMatch = item.description.match(/Depth: (\d+(\.\d+)?)ft/);
+                                        const depth = depthMatch ? parseFloat(depthMatch[1]) : 0;
+                                        handleItemChange(index, 'description', `Width: ${width}ft, Height: ${height}ft, Depth: ${depth}ft`);
+                                        if (item.unit === 'sq.ft') {
+                                          const newQuantity = width * height;
+                                          handleItemChange(index, 'quantity', newQuantity);
+                                          const amount = item.number_of_units * newQuantity * item.unit_price * (1 - (item.discount_percent / 100));
+                                          handleItemChange(index, 'amount', amount);
+                                        }
+                                      }}
+                                      min="0" step="0.01"
+                                      className="w-16 border border-gray-300 rounded px-1.5 py-1 text-xs focus:ring-1 focus:ring-primary-500"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] text-gray-500 mb-0.5">H (ft)</span>
+                                    <input
+                                      type="number"
+                                      value={item.description.includes('Height:') ? parseFloat(item.description.match(/Height: (\d+(\.\d+)?)ft/)?.[1] || '0') : ''}
+                                      onChange={(e) => {
+                                        const height = parseFloat(e.target.value) || 0;
+                                        const widthMatch = item.description.match(/Width: (\d+(\.\d+)?)ft/);
+                                        const width = widthMatch ? parseFloat(widthMatch[1]) : 0;
+                                        const depthMatch = item.description.match(/Depth: (\d+(\.\d+)?)ft/);
+                                        const depth = depthMatch ? parseFloat(depthMatch[1]) : 0;
+                                        handleItemChange(index, 'description', `Width: ${width}ft, Height: ${height}ft, Depth: ${depth}ft`);
+                                        if (item.unit === 'sq.ft') {
+                                          const newQuantity = width * height;
+                                          handleItemChange(index, 'quantity', newQuantity);
+                                          const amount = item.number_of_units * newQuantity * item.unit_price * (1 - (item.discount_percent / 100));
+                                          handleItemChange(index, 'amount', amount);
+                                        }
+                                      }}
+                                      min="0" step="0.01"
+                                      className="w-16 border border-gray-300 rounded px-1.5 py-1 text-xs focus:ring-1 focus:ring-primary-500"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] text-gray-500 mb-0.5">D (ft)</span>
+                                    <input
+                                      type="number"
+                                      value={item.description.includes('Depth:') ? parseFloat(item.description.match(/Depth: (\d+(\.\d+)?)ft/)?.[1] || '0') : ''}
+                                      onChange={(e) => {
+                                        const depth = parseFloat(e.target.value) || 0;
+                                        const widthMatch = item.description.match(/Width: (\d+(\.\d+)?)ft/);
+                                        const width = widthMatch ? parseFloat(widthMatch[1]) : 0;
+                                        const heightMatch = item.description.match(/Height: (\d+(\.\d+)?)ft/);
+                                        const height = heightMatch ? parseFloat(heightMatch[1]) : 0;
+                                        handleItemChange(index, 'description', `Width: ${width}ft, Height: ${height}ft, Depth: ${depth}ft`);
+                                      }}
+                                      min="0" step="0.01"
+                                      className="w-16 border border-gray-300 rounded px-1.5 py-1 text-xs focus:ring-1 focus:ring-primary-500"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] text-gray-500 mb-0.5">Area</span>
+                                    <div className="w-20 border border-gray-200 bg-gray-50 rounded px-1.5 py-1 text-xs text-gray-700 text-center">
+                                      {item.quantity.toFixed(2)}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className={`md:col-span-2 ${item.item_type === 'component' ? 'hidden' : ''}`}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Description
-                            </label>
-                            <textarea
-                              value={item.description}
-                              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                              rows={2}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="Describe the item, specifications, or scope of work"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Number of Units *
-                              <span className="text-xs text-gray-500 font-normal ml-1">(count of materials)</span>
-                            </label>
-                            <input
-                              type="number"
-                              value={item.number_of_units}
-                              onChange={(e) => handleItemChange(index, 'number_of_units', parseFloat(e.target.value) || 1)}
-                              min="1"
-                              step="1"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="e.g., 5 pieces"
-                              required
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Total Measurement * {['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height &&
-                                <span className="text-xs text-green-600 font-normal">(Auto-calculated)</span>
-                              }
-                            </label>
-                            <input
-                              type="number"
-                              value={item.quantity}
-                              onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                              min="0.01"
-                              step="0.01"
-                              readOnly={['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && !!(item.width && item.height)}
-                              className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                                ['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height
-                                  ? 'bg-gray-50 cursor-not-allowed'
-                                  : ''
-                              }`}
-                              title={['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height
-                                ? 'Total measurement is auto-calculated from width × height' + (item.depth ? ' × depth' : '')
-                                : ''
-                              }
-                              required
-                            />
-                            {['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                {item.width} × {item.height}{item.depth ? ` × ${item.depth}` : ''} = {item.quantity.toFixed(2)} {item.unit}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Unit
-                            </label>
-                            <input
-                              type="text"
-                              value={item.unit}
-                              onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="e.g., sq.ft, hours, piece"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Width {['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) &&
-                                <span className="text-xs text-blue-600 font-normal">(for auto-calc)</span>
-                              }
-                            </label>
-                            <input
-                              type="number"
-                              value={item.width || ''}
-                              onChange={(e) => handleItemChange(index, 'width', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="e.g., 10"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Height {['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) &&
-                                <span className="text-xs text-blue-600 font-normal">(for auto-calc)</span>
-                              }
-                            </label>
-                            <input
-                              type="number"
-                              value={item.height || ''}
-                              onChange={(e) => handleItemChange(index, 'height', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="e.g., 5"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Depth {['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) &&
-                                <span className="text-xs text-blue-600 font-normal">(optional, for auto-calc)</span>
-                              }
-                            </label>
-                            <input
-                              type="number"
-                              value={item.depth || ''}
-                              onChange={(e) => handleItemChange(index, 'depth', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="e.g., 2"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Unit Price (₹) *
-                            </label>
-                            <input
-                              type="number"
-                              value={item.unit_price}
-                              onChange={(e) => handleItemChange(index, 'unit_price', e.target.value === '' ? '' : parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              required
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Discount (%)
-                            </label>
-                            <input
-                              type="number"
-                              value={item.discount_percent === 0 ? '' : item.discount_percent}
-                              onChange={(e) => handleItemChange(index, 'discount_percent', parseFloat(e.target.value) || 0)}
-                              min="0"
-                              max="100"
-                              step="0.01"
-                              placeholder="0"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="bg-gray-50 p-3 rounded-lg">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Amount:</span>
-                            <span className="font-semibold text-secondary-800">{formatCurrency(item.amount)}</span>
-                          </div>
-                        </div>
-                      </div>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              {item.item_type === 'component' ? (
+                                <input
+                                  type="text"
+                                  value={item.description}
+                                  onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[120px]"
+                                  placeholder="Description"
+                                />
+                              ) : (
+                                <textarea
+                                  value={item.description}
+                                  onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                                  rows={2}
+                                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[140px] resize-y"
+                                  placeholder="Describe the item"
+                                />
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.number_of_units}
+                                onChange={(e) => handleItemChange(index, 'number_of_units', parseFloat(e.target.value) || 1)}
+                                min="1" step="1"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
+                                required
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                min="0.01" step="0.01"
+                                readOnly={['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && !!(item.width && item.height)}
+                                className={`w-24 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right ${
+                                  ['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height ? 'bg-gray-50 cursor-not-allowed' : ''
+                                }`}
+                                title={['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height
+                                  ? 'Auto-calculated from width × height' + (item.depth ? ' × depth' : '') : ''}
+                                required
+                              />
+                              {['sq.ft', 'sq.m', 'per meter'].includes(item.unit.toLowerCase()) && item.width && item.height && (
+                                <p className="text-[10px] text-gray-400 mt-0.5 whitespace-nowrap">
+                                  {item.width}×{item.height}{item.depth ? `×${item.depth}` : ''}={item.quantity.toFixed(2)}
+                                </p>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="text"
+                                value={item.unit}
+                                onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                                placeholder="sq.ft"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.width || ''}
+                                onChange={(e) => handleItemChange(index, 'width', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
+                                min="0" step="0.01"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
+                                placeholder="—"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.height || ''}
+                                onChange={(e) => handleItemChange(index, 'height', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
+                                min="0" step="0.01"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
+                                placeholder="—"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.depth || ''}
+                                onChange={(e) => handleItemChange(index, 'depth', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
+                                min="0" step="0.01"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
+                                placeholder="—"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.unit_price}
+                                onChange={(e) => handleItemChange(index, 'unit_price', e.target.value === '' ? '' : parseFloat(e.target.value) || 0)}
+                                min="0" step="0.01"
+                                className="w-24 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
+                                required
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <input
+                                type="number"
+                                value={item.discount_percent === 0 ? '' : item.discount_percent}
+                                onChange={(e) => handleItemChange(index, 'discount_percent', parseFloat(e.target.value) || 0)}
+                                min="0" max="100" step="0.01"
+                                placeholder="0"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                              <span className="font-semibold text-secondary-800">{formatCurrency(item.amount)}</span>
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <button
+                                onClick={() => removeItem(index)}
+                                className="text-red-500 hover:text-red-600 transition-colors"
+                                title="Remove item"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
                     ))}
+                        </tbody>
+                      </table>
+                    </div>
                     
                     <button
                       onClick={addItem}
@@ -1558,205 +1485,180 @@ const DesignerQuoteGenerator = () => {
                         </div>
                       )}
 
+                    <div className="overflow-x-auto rounded-lg border border-gray-200">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">#</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Item Name *</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Description</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Width</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">W Unit</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Height</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">H Unit</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Depth</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">D Unit</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">No. of Units</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Discount %</th>
+                            <th className="text-left px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Rate / sq ft (₹)</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Area (sq ft)</th>
+                            <th className="text-right px-3 py-2.5 font-semibold text-secondary-800 whitespace-nowrap">Amount</th>
+                            <th className="px-3 py-2.5"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
                       {quoteData.items.map((item, index) => item.section !== 'modular' ? null : (
-                        <div key={index} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-medium text-secondary-800">Modular Item #{index + 1}</h3>
-                            <button
-                              onClick={() => removeItem(index)}
-                              className="text-red-500 hover:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Item Name *</label>
+                          <tr key={index} className="border-b border-gray-100 hover:bg-gray-50/50 align-top">
+                            <td className="px-3 py-2.5 text-gray-500 font-medium whitespace-nowrap">{index + 1}</td>
+                            <td className="px-3 py-2.5">
                               <input
                                 type="text"
                                 value={item.name}
                                 onChange={(e) => handleItemChange(index, 'name', e.target.value)}
                                 placeholder="e.g. Kitchen Lower Cabinets"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[120px]"
                               />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <input
                                 type="text"
                                 value={item.description}
                                 onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                                placeholder="Optional description"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                placeholder="Optional"
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-w-[120px]"
                               />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Width</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <input
-                                type="number"
-                                min="0"
-                                step="any"
+                                type="number" min="0" step="any"
                                 value={item.width ?? ''}
                                 onChange={(e) => handleItemChange(index, 'width', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
                                 placeholder="e.g. 8"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
                               />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Width Unit</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <select
                                 value={item.width_unit || 'feet'}
                                 onChange={(e) => handleItemChange(index, 'width_unit', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                               >
                                 <option value="feet">feet</option>
                                 <option value="inch">inch</option>
                                 <option value="mm">mm</option>
                               </select>
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <input
-                                type="number"
-                                min="0"
-                                step="any"
+                                type="number" min="0" step="any"
                                 value={item.height ?? ''}
                                 onChange={(e) => handleItemChange(index, 'height', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
                                 placeholder="e.g. 26"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
                               />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Height Unit</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <select
                                 value={item.height_unit || 'feet'}
                                 onChange={(e) => handleItemChange(index, 'height_unit', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                               >
                                 <option value="feet">feet</option>
                                 <option value="inch">inch</option>
                                 <option value="mm">mm</option>
                               </select>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Depth</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <input
-                                type="number"
-                                min="0"
-                                step="any"
+                                type="number" min="0" step="any"
                                 value={item.depth ?? ''}
                                 onChange={(e) => handleItemChange(index, 'depth', e.target.value === '' ? undefined : parseFloat(e.target.value) || 0)}
-                                placeholder="optional"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                placeholder="opt"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
                               />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Depth Unit</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <select
                                 value={item.depth_unit || 'feet'}
                                 onChange={(e) => handleItemChange(index, 'depth_unit', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                               >
                                 <option value="feet">feet</option>
                                 <option value="inch">inch</option>
                                 <option value="mm">mm</option>
                               </select>
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">No. of Units</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <input
-                                type="number"
-                                min="1"
-                                step="1"
+                                type="number" min="1" step="1"
                                 value={item.number_of_units}
                                 onChange={(e) => handleItemChange(index, 'number_of_units', parseFloat(e.target.value) || 1)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
                               />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                            </td>
+                            <td className="px-3 py-2.5">
                               <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="0.1"
+                                type="number" min="0" max="100" step="0.1"
                                 value={item.discount_percent}
                                 onChange={(e) => handleItemChange(index, 'discount_percent', parseFloat(e.target.value) || 0)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-right"
                               />
-                            </div>
-                          </div>
-
-                          <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Rate per sq ft (₹) *</label>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              {MODULAR_PRESET_RATES.map(rate => (
-                                <button
-                                  key={rate}
-                                  type="button"
-                                  onClick={() => {
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <div className="flex flex-wrap gap-1 mb-1">
+                                {MODULAR_PRESET_RATES.map(rate => (
+                                  <button
+                                    key={rate}
+                                    type="button"
+                                    onClick={() => {
+                                      handleItemChange(index, 'per_sqft_rate', rate);
+                                      handleItemChange(index, 'unit_price', rate);
+                                    }}
+                                    className={`px-2 py-1 rounded font-medium text-xs transition-all ${
+                                      (item.per_sqft_rate ?? 0) === rate
+                                        ? 'bg-primary-500 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                    }`}
+                                  >
+                                    ₹{rate}
+                                  </button>
+                                ))}
+                              </div>
+                              <div className="relative">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
+                                <input
+                                  type="number" min="0" step="0.01"
+                                  value={item.per_sqft_rate ?? ''}
+                                  onChange={(e) => {
+                                    const rate = parseFloat(e.target.value) || 0;
                                     handleItemChange(index, 'per_sqft_rate', rate);
                                     handleItemChange(index, 'unit_price', rate);
                                   }}
-                                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                                    (item.per_sqft_rate ?? 0) === rate
-                                      ? 'bg-primary-500 text-white shadow-md'
-                                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                                  }`}
-                                >
-                                  ₹{rate}
-                                </button>
-                              ))}
-                            </div>
-                            <div className="relative inline-block">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={item.per_sqft_rate ?? ''}
-                                onChange={(e) => {
-                                  const rate = parseFloat(e.target.value) || 0;
-                                  handleItemChange(index, 'per_sqft_rate', rate);
-                                  handleItemChange(index, 'unit_price', rate);
-                                }}
-                                placeholder="or enter custom rate"
-                                className="w-40 pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                              />
-                              <span className="text-sm text-gray-500 ml-2">per sq ft</span>
-                            </div>
-                          </div>
-
-                          <div className="bg-gray-50 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-                            <div className="flex flex-wrap gap-x-4 gap-y-1">
-                              <span className="text-gray-600">
-                                Dimensions:
-                                <span className="font-medium text-gray-800 ml-1">
-                                  {item.width ?? 0} {item.width_unit} × {item.height ?? 0} {item.height_unit}
-                                  {item.depth ? ` × ${item.depth} ${item.depth_unit}` : ''}
-                                </span>
-                              </span>
-                              <span className="text-gray-600">
-                                Area: <span className="font-medium text-gray-800">{item.area_sqft ?? 0} sq ft</span>
-                              </span>
-                              <span className="text-gray-600">
-                                Rate: <span className="font-medium text-gray-800">{formatCurrency(item.per_sqft_rate ?? 0)}/sq ft</span>
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-sm text-gray-600">Amount:</span>
+                                  placeholder="custom"
+                                  className="w-28 pl-5 pr-2 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                              <span className="font-medium text-gray-800">{item.area_sqft ?? 0}</span>
+                            </td>
+                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
                               <span className="font-semibold text-secondary-800">{formatCurrency(item.amount)}</span>
-                            </div>
-                          </div>
-                        </div>
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <button
+                                onClick={() => removeItem(index)}
+                                className="text-red-500 hover:text-red-600 transition-colors"
+                                title="Remove item"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
                       ))}
+                        </tbody>
+                      </table>
+                    </div>
 
                       {quoteData.items.filter(i => i.section === 'modular').length > 0 && (
                         <button
