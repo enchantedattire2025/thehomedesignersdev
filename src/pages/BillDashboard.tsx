@@ -502,7 +502,7 @@ const BillDashboard = () => {
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            {/* Context menu */}
+                            /*{/* Context menu */}
                             <div className="relative">
                               <button
                                 onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === bill.id ? null : bill.id); }}
@@ -543,7 +543,7 @@ const BillDashboard = () => {
                                   </div>
                                 </div>
                               )}
-                            </div>
+                            </div>*/
                           </div>
                         </div>
                       </div>
