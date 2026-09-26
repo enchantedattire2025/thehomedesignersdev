@@ -18,6 +18,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDesigner, setIsDesigner] = useState(false);
   const mountedRef = useRef(true);
+  const currentUserIdRef = useRef<string | null>(null);
+
+  const checkUserRoles = async (userId: string) => {
+    const { data: adminData } = await supabase
+      .from('admin_users')
+      .select('id, is_active')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    const { data: designerData } = await supabase
+      .from('designers')
+      .select('id, is_active')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (!mountedRef.current) return;
+
+    setIsAdmin(!!adminData);
+    setIsDesigner(!!designerData);
+  };
 
   useEffect(() => {
     mountedRef.current = true;
@@ -27,27 +49,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (!mountedRef.current) return;
 
+      const sessionUserId = session?.user?.id ?? null;
+      currentUserIdRef.current = sessionUserId;
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        const { data: adminData } = await supabase
-          .from('admin_users')
-          .select('id, is_active')
-          .eq('user_id', session.user.id)
-          .eq('is_active', true)
-          .maybeSingle();
-
-        const { data: designerData } = await supabase
-          .from('designers')
-          .select('id, is_active')
-          .eq('user_id', session.user.id)
-          .eq('is_active', true)
-          .maybeSingle();
-
-        if (!mountedRef.current) return;
-
-        setIsAdmin(!!adminData);
-        setIsDesigner(!!designerData);
+        await checkUserRoles(session.user.id);
       } else {
         setIsAdmin(false);
         setIsDesigner(false);
@@ -61,28 +68,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mountedRef.current) return;
+
+        const sessionUserId = session?.user?.id ?? null;
+
+        // Supabase fires onAuthStateChange on browser tab visibility changes
+        // with the same user ID but a new object reference. Skip the state
+        // update entirely when the user ID hasn't changed to prevent
+        // every page from re-fetching its data on tab switches.
+        if (sessionUserId === currentUserIdRef.current) {
+          setLoading(false);
+          return;
+        }
+
+        currentUserIdRef.current = sessionUserId;
         setUser(session?.user ?? null);
 
         (async () => {
           if (session?.user) {
-            const { data: adminData } = await supabase
-              .from('admin_users')
-              .select('id')
-              .eq('user_id', session.user.id)
-              .eq('is_active', true)
-              .maybeSingle();
-
-            const { data: designerData } = await supabase
-              .from('designers')
-              .select('id')
-              .eq('user_id', session.user.id)
-              .eq('is_active', true)
-              .maybeSingle();
-
-            if (!mountedRef.current) return;
-
-            setIsAdmin(!!adminData);
-            setIsDesigner(!!designerData);
+            await checkUserRoles(session.user.id);
           } else {
             setIsAdmin(false);
             setIsDesigner(false);

@@ -9,6 +9,7 @@ let cachedDesignerPromise: Promise<void> | null = null;
 
 export const useDesignerProfile = () => {
   const { user, loading: authLoading } = useAuth();
+  const userId = user?.id;
   const [designer, setDesigner] = useState<Designer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,7 @@ export const useDesignerProfile = () => {
       return;
     }
 
-    if (!user) {
+    if (!userId) {
       cachedDesigner = null;
       cachedDesignerUserId = null;
       cachedDesignerPromise = null;
@@ -29,7 +30,7 @@ export const useDesignerProfile = () => {
       return;
     }
 
-    if (cachedDesignerUserId === user.id && cachedDesignerPromise) {
+    if (cachedDesignerUserId === userId && cachedDesignerPromise) {
       await cachedDesignerPromise;
       if (!mountedRef.current) return;
       setDesigner(cachedDesigner);
@@ -37,13 +38,13 @@ export const useDesignerProfile = () => {
       return;
     }
 
-    if (cachedDesignerUserId === user.id) {
+    if (cachedDesignerUserId === userId) {
       setDesigner(cachedDesigner);
       setLoading(false);
       return;
     }
 
-    cachedDesignerUserId = user.id;
+    cachedDesignerUserId = userId;
     cachedDesigner = null;
 
     cachedDesignerPromise = (async () => {
@@ -51,7 +52,7 @@ export const useDesignerProfile = () => {
         const { data, error } = await supabase
           .from('designers')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .maybeSingle();
 
         if (error) {
@@ -70,7 +71,7 @@ export const useDesignerProfile = () => {
     if (!mountedRef.current) return;
     setDesigner(cachedDesigner);
     setLoading(false);
-  }, [user, authLoading]);
+  }, [userId, authLoading]);
 
   useEffect(() => {
     mountedRef.current = true;
