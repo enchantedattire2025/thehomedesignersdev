@@ -567,15 +567,7 @@ const saveBill = async (sendToCustomer = false) => {
             </button>
 
             {!viewingVersion && (
-              <>
-                <button
-                  onClick={() => saveBill(false)}
-                  disabled={saving}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4" />
-                  Save Draft
-                </button>
+              <> onClick={() => saveBill(true)}
                 <button
                   onClick={() => saveBill(true)}
                   disabled={saving}
@@ -1023,14 +1015,18 @@ const saveBill = async (sendToCustomer = false) => {
               <Save className="w-4 h-4" />
               Save Draft
             </button>
-            <button
-              onClick={() => saveBill(true)}
-              disabled={saving}
-              className="px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
-            >
-              <Send className="w-4 h-4" />
-              Send to Customer
-            </button>
+           <button
+  onClick={() => saveBill(true)}
+  disabled={saving || items.length === 0}
+  className={`px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
+    items.length === 0
+      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+      : 'bg-teal-600 text-white hover:bg-teal-700'
+  } disabled:opacity-50`}
+>
+  <Send className="w-4 h-4" />
+  Send to Customer
+</button>
           </div>
         )}
       </div>
