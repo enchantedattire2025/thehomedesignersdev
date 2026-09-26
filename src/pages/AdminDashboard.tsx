@@ -85,6 +85,9 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDesigner, setEditingDesigner] = useState<Designer | null>(null);
   const [savingDesigner, setSavingDesigner] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [savingCustomer, setSavingCustomer] = useState(false);
   const [subscriptionManagementEnabled, setSubscriptionManagementEnabled] = useState(false);
   const [updatingSettings, setUpdatingSettings] = useState(false);
 
