@@ -295,8 +295,17 @@ const DesignerBilling = () => {
     setTimeout(() => setSuccess(null), 2000);
   };
 
-  const saveBill = async (sendToCustomer = false) => {
-    if (!bill) return;
+const saveBill = async (sendToCustomer = false) => {
+  if (!bill) return;
+
+  // Prevent sending an empty bill to the customer
+  if (sendToCustomer && items.length === 0) {
+    setError('Cannot send an empty bill. Please add at least one item before sending it to the customer.');
+    setSuccess(null);
+    return;
+  }
+
+  try {
 
     try {
       setSaving(true);
