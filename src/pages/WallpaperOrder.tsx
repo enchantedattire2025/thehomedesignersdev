@@ -129,7 +129,7 @@ export default function WallpaperOrder() {
       areaSqFt = areaSqFt / 144;
     }
 
-    const rate = formData.wallpaper_type === 'golden_foil' ? 260 : 180;
+    const rate = formData.wallpaper_type === 'golden_foil' ? 220 : 160;
     const total = areaSqFt * rate;
     const advance = total * 0.1;
 
