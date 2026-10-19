@@ -53,6 +53,7 @@ const SendToDesignerModal: React.FC<SendToDesignerModalProps> = ({ isOpen, onClo
           .from('designers')
           .select('id, name, email, location, profile_image, specialization')
           .eq('is_active', true)
+          .neq('verification_status', 'rejected')
           .order('name');
 
         if (error) throw error;
@@ -67,6 +68,7 @@ const SendToDesignerModal: React.FC<SendToDesignerModalProps> = ({ isOpen, onClo
           .select('id, name, email, location, profile_image, specialization')
           .in('id', designerIds)
           .eq('is_active', true)
+          .neq('verification_status', 'rejected')
           .order('name');
 
         if (error) throw error;
