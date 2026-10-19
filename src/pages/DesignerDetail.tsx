@@ -12,7 +12,6 @@ import {
   User,
   Navigation
 } from 'lucide-react';
-import { FaInstagram } from 'react-icons/fa';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import AuthModal from '../components/AuthModal';
@@ -662,24 +661,6 @@ const DesignerDetail = () => {
                             {designer.website}
                           </span>
                         </button>
-                      )}
-
-                      {/* Instagram */}
-                      {designer.instagram_url && (
-                        <a
-                          href={designer.instagram_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-pink-500 transition-all duration-200"
-                        >
-                          <span className="w-8 h-8 rounded-md bg-gray-50 flex items-center justify-center flex-shrink-0">
-                            <FaInstagram className="w-4 h-4" />
-                          </span>
-
-                          <span className="text-sm font-medium">
-                            Instagram Portfolio
-                          </span>
-                        </a>
                       )}
 
                     </div>

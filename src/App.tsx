@@ -4,7 +4,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
   useNavigate,
   useLocation
 } from 'react-router-dom';
@@ -30,9 +29,7 @@ import { supabase } from './lib/supabase';
 const Designers = lazy(() => import('./pages/Designers'));
 const Deals = lazy(() => import('./pages/Deals'));
 const DealDetail = lazy(() => import('./pages/DealDetail'));
-const DesignIdeas = lazy(() => import('./pages/Gallery'));
 const Projects = lazy(() => import('./pages/Projects'));
-const Gallery = lazy(() => import('./pages/Gallery'));
 const Materials = lazy(() => import('./pages/Materials'));
 const DesignerDetail = lazy(() => import('./pages/DesignerDetail'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
@@ -79,7 +76,6 @@ const AdminAuditLogs = lazy(() => import('./pages/admin/AdminAuditLogs'));
 const DebugPage = lazy(() => import('./pages/DebugPage'));
 const DebugDesignerProfile = lazy(() => import('./pages/DebugDesignerProfile'));
 
-const SharePhotoForm = lazy(() => import('./pages/SharePhotoForm'));
 const ClearSession = lazy(() => import('./pages/ClearSession'));
 const EmailConfirmation = lazy(() => import('./pages/EmailConfirmation'));
 
@@ -297,8 +293,6 @@ const [subscriptionManagementLoading, setSubscriptionManagementLoading] = useSta
 
             <Route path="/deals" element={<Deals />} />
             <Route path="/deals/:id" element={<DealDetail />} />
-            <Route path="/design-ideas" element={<DesignIdeas />} />
-
             <Route
               path="/projects"
               element={<Projects />}
@@ -307,16 +301,6 @@ const [subscriptionManagementLoading, setSubscriptionManagementLoading] = useSta
             <Route
               path="/projects/:id"
               element={<ProjectDetail />}
-            />
-
-            <Route
-              path="/social-wall"
-              element={<Gallery />}
-            />
-
-            <Route
-              path="/gallery"
-              element={<Navigate to="/social-wall" replace />}
             />
 
             <Route
@@ -476,11 +460,6 @@ const [subscriptionManagementLoading, setSubscriptionManagementLoading] = useSta
             <Route
               path="/debug-profile"
               element={<DebugDesignerProfile />}
-            />
-
-            <Route
-              path="/share-photo"
-              element={<SharePhotoForm />}
             />
 
             <Route
