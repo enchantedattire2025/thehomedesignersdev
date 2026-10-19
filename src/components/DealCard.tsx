@@ -23,7 +23,7 @@ export default function DealCard({ deal, compact = false }: DealCardProps) {
   return (
     <article className={`group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${compact ? '' : 'md:grid md:grid-cols-[0.9fr_1.1fr]'}`}>
       <div className={`relative overflow-hidden bg-stone-100 ${compact ? 'aspect-[1.35]' : 'min-h-56'}`}>
-        {deal.image_url ? <img src={deal.image_url} alt={deal.title} loading="lazy" className="h-full w-full object-contain transition duration-500 group-hover:scale-105" /> : <div className="flex h-full min-h-56 items-center justify-center bg-gradient-to-br from-primary-50 to-stone-100 text-primary-600"><Gift className="h-14 w-14" aria-hidden="true" /></div>}
+        {deal.image_url ? <img src={deal.image_url} alt={deal.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-full min-h-56 items-center justify-center bg-gradient-to-br from-primary-50 to-stone-100 text-primary-600"><Gift className="h-14 w-14" aria-hidden="true" /></div>}
         <span className="absolute left-4 top-4 rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">{deal.discount_percentage}% OFF</span>
       </div>
       <div className="flex flex-col p-5 md:p-6">
