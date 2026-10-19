@@ -6,7 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-// Minimal HMAC-SHA256 using Web Crypto (Deno compatible)
 async function hmacSha256(message: string, secret: string): Promise<string> {
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -58,19 +57,28 @@ if (import.meta.main) {
 
       const razorpayKeySecret = Deno.env.get("RAZORPAY_KEY_SECRET") || "placeholder_secret";
 
+      // Verify the provider signature before trusting anything
       const expectedSignature = await hmacSha256(
         `${razorpayOrderId}|${razorpayPaymentId}`,
         razorpayKeySecret
       );
 
       if (expectedSignature !== razorpaySignature) {
+        // Record the failure (idempotent on order id)
+        await supabase.rpc("update_payment_failure", {
+          p_quote_id: quoteId,
+          p_razorpay_order_id: razorpayOrderId,
+          p_status: "failed",
+          p_failure_reason: "Signature verification failed",
+        });
+
         return new Response(
           JSON.stringify({ error: "Payment signature verification failed" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      // Load quote to compute confirmation amount for record_quote_payment
+      // Load the quote to get the expected advance amount
       const { data: quote } = await supabase
         .from("designer_quotes")
         .select("id, confirmation_amount, project_id")
@@ -84,12 +92,18 @@ if (import.meta.main) {
         });
       }
 
-      // Call the SECURITY DEFINER function to mark payment verified (idempotent)
+      // record_quote_payment is idempotent (no-op if a paid row already exists)
+      // and activates the project only here.
       const { error: rpcError } = await supabase.rpc("record_quote_payment", {
         p_quote_id: quoteId,
         p_razorpay_order_id: razorpayOrderId,
         p_razorpay_payment_id: razorpayPaymentId,
         p_amount: quote.confirmation_amount,
+        p_provider_response: {
+          razorpay_order_id: razorpayOrderId,
+          razorpay_payment_id: razorpayPaymentId,
+          verified_at: new Date().toISOString(),
+        },
       });
 
       if (rpcError) {

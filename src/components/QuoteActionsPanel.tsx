@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CheckCircle,
   XCircle,
@@ -12,6 +12,8 @@ import {
   IndianRupee,
   ShieldCheck,
   Info,
+  RotateCcw,
+  Ban,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -53,6 +55,27 @@ const QuoteActionsPanel: React.FC<QuoteActionsPanelProps> = ({ quote, onRefresh 
 
   // Accept & Proceed state
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  // Configured advance payment config (percent + min + terms)
+  const [advanceConfig, setAdvanceConfig] = useState<{ percent: number; min_amount: number; terms: string }>({ percent: 10, min_amount: 0, terms: '' });
+
+  useEffect(() => {
+    supabase
+      .rpc('get_advance_payment_config')
+      .then(({ data }) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const row = data[0];
+          setAdvanceConfig({
+            percent: Number(row.percent) || 10,
+            min_amount: Number(row.min_amount) || 0,
+            terms: row.terms || '',
+          });
+        }
+      })
+      .catch(() => {
+        /* keep defaults */
+      });
+  }, []);
 
   // Request Changes state
   const [changeOptions, setChangeOptions] = useState<string[]>([]);
@@ -259,6 +282,26 @@ const QuoteActionsPanel: React.FC<QuoteActionsPanelProps> = ({ quote, onRefresh 
     }
   };
 
+  const handleCancelAcceptance = async () => {
+    if (!user) return;
+    try {
+      setSubmitting(true);
+      setError(null);
+      const { error: rpcError } = await supabase.rpc('cancel_quote_acceptance', {
+        p_quote_id: quote.id,
+        p_reason: 'Cancelled by homeowner before advance payment',
+      });
+      if (rpcError) throw rpcError;
+      setSuccess('Quotation selection cancelled. The project is open for quotations again.');
+      setActionMode(null);
+      onRefresh();
+    } catch (err: any) {
+      setError(err.message || 'Failed to cancel acceptance.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const toggleChangeOption = (key: string) => {
     setChangeOptions((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   };
@@ -271,7 +314,7 @@ const QuoteActionsPanel: React.FC<QuoteActionsPanelProps> = ({ quote, onRefresh 
           <ShieldCheck className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
           <div>
             <p className="font-medium text-green-800">Quotation Confirmed</p>
-            <p className="text-sm text-green-700">Your 10% confirmation payment has been verified. Designer contact details are now unlocked below.</p>
+            <p className="text-sm text-green-700">Your {advanceConfig.percent}% confirmation payment has been verified. The designer's contact details are unlocked below and the project is now active.</p>
           </div>
         </div>
       );
@@ -280,9 +323,25 @@ const QuoteActionsPanel: React.FC<QuoteActionsPanelProps> = ({ quote, onRefresh 
       return (
         <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4 flex items-start space-x-2">
           <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="font-medium text-amber-800">Payment Pending</p>
-            <p className="text-sm text-amber-700">You initiated acceptance but the 10% payment has not been verified yet. Designer contact details remain locked until payment is confirmed.</p>
+          <div className="flex-1">
+            <p className="font-medium text-amber-800">Advance Payment Pending</p>
+            <p className="text-sm text-amber-700">You accepted this quotation but the {advanceConfig.percent}% advance payment has not been verified yet. The designer's contact details remain locked until payment is confirmed. Use Retry below to complete the payment, or Cancel to release the selection.</p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <button
+                onClick={() => { setError(null); setSuccess(null); setActionMode('accept'); }}
+                className="inline-flex items-center space-x-1.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" /><span>Retry Payment</span>
+              </button>
+              <button
+                onClick={handleCancelAcceptance}
+                disabled={submitting}
+                className="inline-flex items-center space-x-1.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
+                <span>Cancel Selection</span>
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -354,8 +413,11 @@ const QuoteActionsPanel: React.FC<QuoteActionsPanelProps> = ({ quote, onRefresh 
   // ===== Modals =====
   const renderAcceptModal = () => {
     const total = Number(quote.total_amount || 0);
-    const confirmation = Math.round(total * 0.1);
+    const confirmationAmountFromQuote = Number(quote.confirmation_amount || 0);
+    const computed = Math.round(total * (advanceConfig.percent / 100));
+    const confirmation = confirmationAmountFromQuote > 0 ? confirmationAmountFromQuote : computed;
     const balance = total - confirmation;
+    const percentLabel = advanceConfig.percent;
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -375,23 +437,29 @@ const QuoteActionsPanel: React.FC<QuoteActionsPanelProps> = ({ quote, onRefresh 
                 <span className="font-semibold text-secondary-800">{formatCurrency(total)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">10% Confirmation Amount</span>
-                <span className="font-semibold text-primary-600 flex items-center"><IndianRupee className="w-3.5 h-3.5" />{confirmation.toLocaleString('en-IN')}</span>
+                <span className="text-gray-600">{percentLabel}% Advance Amount</span>
+                <span className="font-semibold text-primary-600 flex items-center"><IndianRupee className="w-3.5 h-3.5" />{Number(confirmation).toLocaleString('en-IN')}</span>
               </div>
               <div className="border-t border-gray-200 pt-2 flex justify-between text-sm">
                 <span className="text-gray-600">Remaining Balance</span>
                 <span className="font-semibold text-gray-700">{formatCurrency(balance)}</span>
               </div>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700 flex items-start space-x-2">
+            {advanceConfig.terms && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700 flex items-start space-x-2">
+                <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{advanceConfig.terms}</span>
+              </div>
+            )}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700 flex items-start space-x-2">
               <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span>You will pay a 10% confirmation amount now via Razorpay. The designer's contact details will be unlocked only after this payment is verified. The remaining balance is coordinated directly with your designer.</span>
+              <span>Accepting selects this designer and closes the other quotations for this project. You will pay the {percentLabel}% advance amount now via Razorpay. The designer's contact details unlock only after this payment is verified, and the project becomes active at that point.</span>
             </div>
             <div className="flex gap-3 pt-2">
               <button onClick={closeAll} disabled={paymentProcessing} className="flex-1 bg-gray-200 text-gray-800 py-2.5 rounded-lg font-medium hover:bg-gray-300 transition-colors disabled:opacity-50">Cancel</button>
               <button onClick={handleAcceptAndProceed} disabled={paymentProcessing} className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-2.5 rounded-lg font-semibold transition-colors disabled:opacity-50 flex items-center justify-center space-x-2">
                 {paymentProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
-                <span>{paymentProcessing ? 'Processing...' : 'Pay 10% Now'}</span>
+                <span>{paymentProcessing ? 'Processing...' : `Pay ${percentLabel}% Now`}</span>
               </button>
             </div>
           </div>

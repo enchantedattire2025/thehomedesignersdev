@@ -17,7 +17,7 @@ if (import.meta.main) {
       const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-      // Authenticate the caller from the Authorization header
+      // Authenticate the caller
       const authHeader = req.headers.get("Authorization") || "";
       const token = authHeader.replace("Bearer ", "");
       const { data: userData, error: userError } = await supabase.auth.getUser(token);
@@ -32,6 +32,7 @@ if (import.meta.main) {
 
       const body = await req.json();
       const quoteId: string | undefined = body?.quoteId;
+      const feedback: string | undefined = body?.feedback;
       if (!quoteId) {
         return new Response(JSON.stringify({ error: "Missing quoteId" }), {
           status: 400,
@@ -39,45 +40,54 @@ if (import.meta.main) {
         });
       }
 
-      // Load the quote and verify ownership via the customer link
-      const { data: quote, error: quoteError } = await supabase
-        .from("designer_quotes")
-        .select("id, total_amount, project_id, status, payment_status, designer_id")
-        .eq("id", quoteId)
-        .maybeSingle();
+      // 1) Server-enforced, atomic quotation acceptance. This locks the project,
+      //    verifies ownership, refuses if another quote already won, rejects
+      //    competing quotes (ANOTHER_DESIGNER_SELECTED), closes competing
+      //    project_assignments, notifies designers, and computes the advance
+      //    amount from the configured percentage.
+      const { data: acceptResult, error: acceptError } = await supabase.rpc(
+        "accept_quote",
+        { p_quote_id: quoteId, p_feedback: feedback ?? null }
+      );
 
-      if (quoteError || !quote) {
-        return new Response(JSON.stringify({ error: "Quote not found" }), {
-          status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      const { data: customer, error: custError } = await supabase
-        .from("customers")
-        .select("id, user_id")
-        .eq("id", quote.project_id)
-        .maybeSingle();
-
-      if (custError || !customer || customer.user_id !== userId) {
-        return new Response(JSON.stringify({ error: "You do not own this quote" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Prevent re-payment if already verified
-      if (quote.payment_status === "verified") {
+      if (acceptError) {
         return new Response(
-          JSON.stringify({ error: "This quotation has already been confirmed." }),
+          JSON.stringify({ error: acceptError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // accept_quote returns a table; supabase-js returns an array
+      const accepted = Array.isArray(acceptResult) ? acceptResult[0] : acceptResult;
+      if (!accepted || accepted.success !== true) {
+        return new Response(
+          JSON.stringify({ error: "Failed to accept quotation." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const advanceAmountRupees = Number(accepted.advance_amount);
+      const confirmationAmount = Math.round(advanceAmountRupees * 100); // paise
+
+      // 2) Refuse to create a payment order if one is already paid (idempotency)
+      const { data: existingPaid } = await supabase
+        .from("quote_advance_payments")
+        .select("id, status")
+        .eq("quote_id", quoteId)
+        .eq("status", "paid")
+        .maybeSingle();
+
+      if (existingPaid) {
+        return new Response(
+          JSON.stringify({
+            error: "This quotation has already been confirmed and paid.",
+            alreadyPaid: true,
+          }),
           { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      const totalAmount = Number(quote.total_amount);
-      const confirmationAmount = Math.round(totalAmount * 0.1 * 100); // paise
-
-      // Razorpay key (placeholder — replace with real RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET secrets)
+      // 3) Create the Razorpay order for the advance amount
       const razorpayKeyId = Deno.env.get("RAZORPAY_KEY_ID") || "rzp_test_placeholder";
       const razorpayKeySecret = Deno.env.get("RAZORPAY_KEY_SECRET") || "placeholder_secret";
 
@@ -88,7 +98,7 @@ if (import.meta.main) {
         notes: {
           quote_id: quoteId,
           customer_user_id: userId,
-          confirmation: "10_percent",
+          advance_amount_rupees: advanceAmountRupees,
         },
       };
 
@@ -104,7 +114,14 @@ if (import.meta.main) {
       const orderJson = await orderRes.json();
 
       if (!orderRes.ok) {
-        // Surface a clear message so the app owner knows to set real Razorpay keys
+        // Record the failure on the payment record (creates a failed row)
+        await supabase.rpc("update_payment_failure", {
+          p_quote_id: quoteId,
+          p_razorpay_order_id: orderJson?.id ?? `failed_${Date.now()}`,
+          p_status: "failed",
+          p_failure_reason: "Razorpay order creation failed",
+        });
+
         return new Response(
           JSON.stringify({
             error:
@@ -119,18 +136,30 @@ if (import.meta.main) {
         );
       }
 
-      // Persist the order id on the quote and set status to accepted-pending
-      await supabase
-        .from("designer_quotes")
-        .update({
+      // 4) Persist the pending payment record linked to quote/project/designer.
+      //    The unique(razorpay_order_id) constraint makes this idempotent per order.
+      const { error: payInsertError } = await supabase
+        .from("quote_advance_payments")
+        .insert({
+          quote_id: quoteId,
+          project_id: accepted.project_id,
+          designer_id: accepted.designer_id,
+          customer_user_id: userId,
           razorpay_order_id: orderJson.id,
-          confirmation_amount: confirmationAmount / 100,
-          status: "accepted",
-          customer_accepted: true,
-          acceptance_date: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", quoteId);
+          amount: advanceAmountRupees,
+          currency: "INR",
+          status: "pending",
+        });
+
+      if (payInsertError) {
+        // If it's a duplicate order id, treat as idempotent and continue
+        if (!String(payInsertError.message).includes("duplicate")) {
+          return new Response(
+            JSON.stringify({ error: "Failed to record payment record: " + payInsertError.message }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
 
       return new Response(
         JSON.stringify({
@@ -138,6 +167,8 @@ if (import.meta.main) {
           amount: confirmationAmount,
           currency: "INR",
           keyId: razorpayKeyId,
+          advanceAmountRupees,
+          acceptedQuoteId: quoteId,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
