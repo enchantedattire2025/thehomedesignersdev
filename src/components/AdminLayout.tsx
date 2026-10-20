@@ -1,4 +1,4 @@
-```tsx
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -81,7 +81,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   const location = useLocation();
   const { signOut } = useAuth();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const isActive = (path: string) => {
@@ -97,59 +97,53 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
     navigate('/');
   };
 
-  const closeMobileSidebar = () => setSidebarOpen(false);
+  const closeMobileSidebar = () => setMobileSidebarOpen(false);
 
-  const sidebar = (
+  const sidebarContent = (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-secondary-900 text-gray-300">
-      {/* Sidebar header: branding and desktop/mobile controls */}
-      <div className="flex shrink-0 items-center gap-2.5 border-b border-secondary-700/50 px-4 py-4">
+      {/* Sidebar header */}
+      <div className="flex shrink-0 items-center gap-2.5 border-b border-secondary-700/50 px-3 py-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500">
           <LayoutDashboard className="h-5 w-5 text-white" />
         </div>
 
-        {desktopSidebarOpen || sidebarOpen ? (
-          <>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-white">
-                Admin Console
-              </p>
-              <p className="truncate text-xs text-gray-400">
-                TheHomeDesigners
-              </p>
-            </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-white">
+            Admin Console
+          </p>
+          <p className="truncate text-xs text-gray-400">
+            TheHomeDesigners
+          </p>
+        </div>
 
-            {/* One close/collapse control inside the sidebar */}
-            <button
-              type="button"
-              onClick={() => {
-                if (window.innerWidth >= 1024) {
-                  setDesktopSidebarOpen(false);
-                } else {
-                  setSidebarOpen(false);
-                }
-              }}
-              className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white"
-              aria-label="Collapse sidebar"
-              title="Collapse sidebar"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setDesktopSidebarOpen(true)}
-            className="rounded-lg p-2 text-gray-300 transition-colors hover:bg-secondary-800 hover:text-white"
-            aria-label="Expand sidebar"
-            title="Expand sidebar"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        )}
+        {/* Desktop collapse button inside the sidebar */}
+        <button
+          type="button"
+          onClick={() => setDesktopSidebarOpen(false)}
+          className="hidden shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white lg:inline-flex"
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        {/* Mobile close button */}
+        <button
+          type="button"
+          onClick={closeMobileSidebar}
+          className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white lg:hidden"
+          aria-label="Close sidebar"
+          title="Close sidebar"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Scrollable sidebar: navigation AND Sign Out */}
-      <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4">
+      {/* Independently scrollable navigation and Sign Out */}
+      <nav
+        aria-label="Admin navigation"
+        className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
+      >
         <div className="space-y-5">
           {NAV_SECTIONS.map((section) => (
             <div key={section.title}>
@@ -170,7 +164,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
                         navigate(item.path);
                         closeMobileSidebar();
                       }}
-                      title={!desktopSidebarOpen ? item.label : undefined}
                       className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
                         active
                           ? 'bg-sky-500/15 text-sky-300'
@@ -197,7 +190,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
             </div>
           ))}
 
-          {/* Sign Out is inside the same scrollable nav container */}
+          {/* Sign Out is inside the same scrollable navigation */}
           <div className="border-t border-secondary-700/50 pt-4">
             <button
               type="button"
@@ -215,33 +208,37 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <div className="flex min-h-screen w-full overflow-x-clip bg-gray-50">
-      {/* Desktop sidebar: participates in layout instead of being fixed */}
+      {/* Desktop sidebar: fixed to viewport height */}
       {desktopSidebarOpen && (
-        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start lg:block">
-          {sidebar}
+        <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-60 overflow-hidden lg:block">
+          {sidebarContent}
         </aside>
       )}
 
       {/* Mobile sidebar drawer */}
-      {sidebarOpen && (
+      {mobileSidebarOpen && (
         <>
           <button
             type="button"
-            aria-label="Close navigation overlay"
+            aria-label="Close sidebar overlay"
             className="fixed inset-0 z-40 bg-black/40 lg:hidden"
             onClick={closeMobileSidebar}
           />
 
-          <aside className="fixed inset-y-0 left-0 z-50 block h-screen w-60 max-w-[85vw] lg:hidden">
-            {sidebar}
+          <aside className="fixed inset-y-0 left-0 z-50 h-dvh w-60 max-w-[85vw] overflow-hidden lg:hidden">
+            {sidebarContent}
           </aside>
         </>
       )}
 
       {/* Main content column */}
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      <div
+        className={`flex min-h-screen min-w-0 flex-1 flex-col ${
+          desktopSidebarOpen ? 'lg:ml-60' : ''
+        }`}
+      >
         {/* Desktop header */}
-        <header className="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-6 lg:flex">
+        <header className="sticky top-0 z-20 hidden h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-6 lg:flex">
           {!desktopSidebarOpen && (
             <button
               type="button"
@@ -254,14 +251,16 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
             </button>
           )}
 
-          <span className="font-semibold text-gray-800">Admin Console</span>
+          <span className="font-semibold text-gray-800">
+            Admin Console
+          </span>
         </header>
 
         {/* Mobile header */}
-        <header className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
+        <header className="sticky top-0 z-20 flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
           <button
             type="button"
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => setMobileSidebarOpen(true)}
             className="rounded-lg p-2 text-gray-700 transition-colors hover:bg-gray-100"
             aria-label="Open sidebar"
             title="Open sidebar"
@@ -277,9 +276,11 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         </header>
 
         {/* Dashboard content */}
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          {children}
+        </main>
 
-        {/* Footer stays aligned with the main content column */}
+        {/* Footer remains below the dashboard in the main column */}
         <Footer />
       </div>
     </div>
@@ -287,5 +288,3 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export default AdminLayout;
-```
-
