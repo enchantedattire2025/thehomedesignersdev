@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -17,9 +18,10 @@ import {
   Menu,
   X,
   LogOut,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import Footer from './Footer';
 
 interface NavItem {
   label: string;
@@ -42,7 +44,11 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'Projects', icon: FolderKanban, path: '/admin/projects' },
       { label: 'Quotations', icon: FileText, path: '/admin/quotations' },
-      { label: 'Subscriptions & Billing', icon: CreditCard, path: '/admin/subscriptions' },
+      {
+        label: 'Subscriptions & Billing',
+        icon: CreditCard,
+        path: '/admin/subscriptions',
+      },
       { label: 'AI Quotation', icon: Sparkles, path: '/admin/ai-monitoring' },
     ],
   },
@@ -68,14 +74,21 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   },
 ];
 
-const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const isActive = (path: string) => {
-    if (path === '/admin') return location.pathname === '/admin';
+    if (path === '/admin') {
+      return location.pathname === '/admin';
+    }
+
     return location.pathname.startsWith(path);
   };
 
@@ -84,109 +97,187 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     navigate('/');
   };
 
-  const sidebar = (
-    <div className="h-full flex flex-col bg-secondary-900 text-gray-300">
-      {/* Logo */}
-      <div className="px-5 py-5 border-b border-secondary-700/50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-sky-500 rounded-lg flex items-center justify-center shrink-0">
-            <LayoutDashboard className="w-5 h-5 text-white" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-white font-semibold text-sm truncate">Admin Console</p>
-            <p className="text-gray-400 text-xs">TheHomeDesigners</p>
-          </div>
+  const closeMobileSidebar = () => setMobileSidebarOpen(false);
+
+  const sidebarContent = (
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-secondary-900 text-gray-300">
+      {/* Sidebar header */}
+      <div className="flex shrink-0 items-center gap-2.5 border-b border-secondary-700/50 px-3 py-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500">
+          <LayoutDashboard className="h-5 w-5 text-white" />
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {NAV_SECTIONS.map((section) => (
-          <div key={section.title}>
-            <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
-              {section.title}
-            </p>
-            <div className="space-y-0.5">
-              {section.items.map((item) => {
-                const active = isActive(item.path);
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.path}
-                    onClick={() => {
-                      navigate(item.path);
-                      setSidebarOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                      active
-                        ? 'bg-sky-500/15 text-sky-300'
-                        : 'text-gray-400 hover:bg-secondary-800 hover:text-gray-200'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-sky-400' : ''}`} />
-                    <span className="flex-1 text-left truncate">{item.label}</span>
-                    {active && <ChevronRight className="w-3.5 h-3.5 text-sky-400" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-white">
+            Admin Console
+          </p>
+          <p className="truncate text-xs text-gray-400">
+            TheHomeDesigners
+          </p>
+        </div>
 
-      {/* Footer */}
-      <div className="px-3 py-4 border-t border-secondary-700/50">
+        {/* Desktop collapse control */}
         <button
-          onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-300 transition-all"
+          type="button"
+          onClick={() => setDesktopSidebarOpen(false)}
+          className="hidden shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white lg:inline-flex"
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
         >
-          <LogOut className="w-4 h-4 shrink-0" />
-          <span>Sign Out</span>
+          <X className="h-5 w-5" />
+        </button>
+
+        {/* Mobile drawer close control */}
+        <button
+          type="button"
+          onClick={closeMobileSidebar}
+          className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white lg:hidden"
+          aria-label="Close sidebar"
+          title="Close sidebar"
+        >
+          <X className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Navigation and Sign Out share the same scrollable container */}
+      <nav
+        aria-label="Admin navigation"
+        className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4"
+      >
+        <div className="space-y-5">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.title}>
+              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
+                {section.title}
+              </p>
+
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const active = isActive(item.path);
+                  const Icon = item.icon;
+
+                  return (
+                    <button
+                      key={item.path}
+                      type="button"
+                      onClick={() => {
+                        navigate(item.path);
+                        closeMobileSidebar();
+                      }}
+                      className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                        active
+                          ? 'bg-sky-500/15 text-sky-300'
+                          : 'text-gray-400 hover:bg-secondary-800 hover:text-gray-200'
+                      }`}
+                    >
+                      <Icon
+                        className={`h-4 w-4 shrink-0 ${
+                          active ? 'text-sky-400' : ''
+                        }`}
+                      />
+
+                      <span className="min-w-0 flex-1 truncate">
+                        {item.label}
+                      </span>
+
+                      {active && (
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-sky-400" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          {/* Sign Out is part of the scrollable navigation */}
+          <div className="border-t border-secondary-700/50 pt-4">
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+            >
+              <LogOut className="h-4 w-4 shrink-0" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </nav>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 shrink-0 fixed inset-y-0 left-0 z-30">
-        {sidebar}
-      </aside>
+    <div className="flex min-h-screen w-full overflow-x-clip bg-gray-50">
+      {/* Desktop sidebar participates in the layout */}
+      {desktopSidebarOpen && (
+        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start lg:block">
+          {sidebarContent}
+        </aside>
+      )}
 
-      {/* Mobile sidebar */}
-      {sidebarOpen && (
+      {/* Mobile sidebar drawer */}
+      {mobileSidebarOpen && (
         <>
-          <div
-            className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
+          <button
+            type="button"
+            aria-label="Close sidebar overlay"
+            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+            onClick={closeMobileSidebar}
           />
-          <aside className="fixed inset-y-0 left-0 w-64 z-50 lg:hidden">
-            {sidebar}
+
+          <aside className="fixed inset-y-0 left-0 z-50 h-screen w-60 max-w-[85vw] lg:hidden">
+            {sidebarContent}
           </aside>
         </>
       )}
 
-      {/* Main content */}
-      <div className="flex-1 lg:ml-64 min-w-0 flex flex-col">
-        {/* Mobile header */}
-        <header className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100"
-          >
-            <Menu className="w-5 h-5 text-gray-700" />
-          </button>
-          <span className="font-semibold text-gray-800 text-sm">Admin Console</span>
-          <button
-            onClick={handleSignOut}
-            className="p-2 rounded-lg hover:bg-gray-100"
-          >
-            <LogOut className="w-5 h-5 text-gray-700" />
-          </button>
+      {/* Main content and footer share the remaining width */}
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+        {/* Desktop header */}
+        <header className="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-6 lg:flex">
+          {!desktopSidebarOpen && (
+            <button
+              type="button"
+              onClick={() => setDesktopSidebarOpen(true)}
+              className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              aria-label="Open sidebar"
+              title="Open sidebar"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
+
+          <span className="font-semibold text-gray-800">
+            Admin Console
+          </span>
         </header>
 
-        <main className="flex-1 min-w-0">{children}</main>
+        {/* Mobile header */}
+        <header className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className="rounded-lg p-2 text-gray-700 transition-colors hover:bg-gray-100"
+            aria-label="Open sidebar"
+            title="Open sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <span className="text-sm font-semibold text-gray-800">
+            Admin Console
+          </span>
+
+          <div className="w-9" aria-hidden="true" />
+        </header>
+
+        {/* Dashboard content */}
+        <main className="min-w-0 flex-1">
+          {children}
+        </main>
+
+        {/* Footer aligns with the main content, not behind the sidebar */}
+        <Footer />
       </div>
     </div>
   );
