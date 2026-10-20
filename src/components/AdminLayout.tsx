@@ -102,7 +102,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   const sidebarContent = (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-secondary-900 text-gray-300">
       {/* Sidebar header */}
-      <div className="flex shrink-0 items-center gap-2.5 border-b border-secondary-700/50 px-3 py-4">
+      <div className="flex shrink-0 items-center gap-2 border-b border-secondary-700/50 px-3 py-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500">
           <LayoutDashboard className="h-5 w-5 text-white" />
         </div>
@@ -116,22 +116,22 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           </p>
         </div>
 
-        {/* Desktop hamburger: inside the sidebar when open */}
+        {/* Desktop toggle: visible inside the expanded sidebar */}
         <button
           type="button"
           onClick={() => setDesktopSidebarOpen(false)}
-          className="hidden shrink-0 rounded-md p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white lg:inline-flex"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-secondary-800 hover:text-white"
           aria-label="Close sidebar"
           title="Close sidebar"
         >
           <Menu className="h-5 w-5" />
         </button>
 
-        {/* Mobile close control */}
+        {/* Mobile drawer close button */}
         <button
           type="button"
           onClick={closeMobileSidebar}
-          className="shrink-0 rounded-md p-2 text-gray-400 transition-colors hover:bg-secondary-800 hover:text-white lg:hidden"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-secondary-800 hover:text-white lg:hidden"
           aria-label="Close sidebar"
           title="Close sidebar"
         >
@@ -139,7 +139,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         </button>
       </div>
 
-      {/* Scrollable navigation and Sign Out */}
+      {/* Scrollable navigation, including Sign Out */}
       <nav
         aria-label="Admin navigation"
         className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
@@ -231,19 +231,19 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         </>
       )}
 
-      {/* Main content column */}
+      {/* Main content */}
       <div
         className={`flex min-h-screen min-w-0 flex-1 flex-col ${
           desktopSidebarOpen ? 'lg:ml-60' : ''
         }`}
       >
-        {/* Desktop header: hamburger appears here only when sidebar is closed */}
+        {/* Desktop header: toggle appears here only when sidebar is closed */}
         <header className="sticky top-0 z-20 hidden h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-6 lg:flex">
           {!desktopSidebarOpen && (
             <button
               type="button"
               onClick={() => setDesktopSidebarOpen(true)}
-              className="rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
               aria-label="Open sidebar"
               title="Open sidebar"
             >
@@ -261,7 +261,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           <button
             type="button"
             onClick={() => setMobileSidebarOpen(true)}
-            className="rounded-md p-2 text-gray-700 transition-colors hover:bg-gray-100"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-gray-100"
             aria-label="Open sidebar"
             title="Open sidebar"
           >
@@ -280,7 +280,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           {children}
         </main>
 
-        {/* Footer stays in the main content column */}
+        {/* Footer aligned with the main content column */}
         <Footer />
       </div>
     </div>
