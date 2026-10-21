@@ -179,7 +179,11 @@ const DashboardRedirectHandler = () => {
  * access the authentication context.
  */
 const AppContent: React.FC = () => {
-  const location = useLocation();
+  const location = useLocation();  
+  useEffect(() => 
+  {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   const [subscriptionManagementEnabled, setSubscriptionManagementEnabled] = useState(false);
 const [subscriptionManagementLoading, setSubscriptionManagementLoading] = useState(true);
 
