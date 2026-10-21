@@ -185,7 +185,7 @@ const AppContent: React.FC = () => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
   const [subscriptionManagementEnabled, setSubscriptionManagementEnabled] = useState(false);
-const [subscriptionManagementLoading, setSubscriptionManagementLoading] = useState(true);
+  const [subscriptionManagementLoading, setSubscriptionManagementLoading] = useState(true);
 
   const {
     subscription,
