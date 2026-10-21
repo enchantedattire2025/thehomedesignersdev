@@ -20,7 +20,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import Footer from './Footer';
 
 interface NavItem {
   label: string;
@@ -80,11 +79,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   const location = useLocation();
   const { signOut } = useAuth();
 
-  // Sidebar visibility
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Active navigation item
+  // Check active navigation item
   const isActive = (path: string) => {
     if (path === '/admin') {
       return location.pathname === '/admin';
@@ -99,7 +97,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
     navigate('/');
   };
 
-  // Open or close the sidebar from the main header
+  // Close sidebar
+  const closeSidebar = () => {
+    setDesktopSidebarOpen(false);
+    setMobileSidebarOpen(false);
+  };
+
+  // Open or close sidebar based on screen size
   const toggleSidebar = () => {
     if (window.matchMedia('(min-width: 1024px)').matches) {
       setDesktopSidebarOpen((d) => !d);
@@ -108,14 +112,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Close sidebar after navigation on mobile
   const closeMobileSidebar = () => {
-    setMobileSidebarOpen(false);
-  };
-
-  // Close sidebar using the panel icon inside its header
-  const closeSidebarFromHeader = () => {
-    setDesktopSidebarOpen(false);
     setMobileSidebarOpen(false);
   };
 
@@ -139,10 +136,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           </p>
         </div>
 
-        {/* Sidebar toggle stays fixed above navigation */}
+        {/* Sidebar toggle remains fixed while navigation scrolls */}
         <button
           type="button"
-          onClick={closeSidebarFromHeader}
+          onClick={closeSidebar}
           className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-secondary-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           aria-label="Close sidebar"
           title="Close sidebar"
@@ -152,7 +149,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
 
       </div>
 
-      {/* Independently scrollable navigation */}
+      {/* Only navigation scrolls */}
       <nav
         aria-label="Admin navigation"
         className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
@@ -228,7 +225,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
 
       {/* Desktop sidebar */}
       {desktopSidebarOpen && (
-        <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-60 overflow-hidden lg:block">
+        <aside className="fixed inset-y-0 left-0 z-40 hidden h-dvh w-60 overflow-hidden lg:block">
           {sidebarContent}
         </aside>
       )}
@@ -257,10 +254,9 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
       >
 
         {/* Admin header */}
-        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:px-6">
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:px-6">
 
-          {/* Show toggle in main header only when sidebar is closed on desktop.
-              On mobile, keep it visible so the drawer can be opened. */}
+          {/* Toggle visible when sidebar is closed on desktop */}
           <button
             type="button"
             onClick={toggleSidebar}
@@ -268,7 +264,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
               desktopSidebarOpen ? 'lg:hidden' : ''
             }`}
             aria-label="Open sidebar"
-            aria-expanded={desktopSidebarOpen || mobileSidebarOpen}
             title="Open sidebar"
           >
             <PanelLeft className="h-5 w-5" />
@@ -285,11 +280,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           {children}
         </main>
 
-        {/* Footer stays in main column and shifts with sidebar */}
-        <Footer />
-
       </div>
-
     </div>
   );
 };
