@@ -254,6 +254,7 @@ const AppContent: React.FC = () => {
     !isSubscriptionPage;
 
   const isQuotationView = location.pathname.startsWith('/view-quote/');
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -265,8 +266,9 @@ const AppContent: React.FC = () => {
         Therefore navbar tabs remain clickable.
         Hidden on quotation views so the downloaded/printed
         quotation is completely free of website branding.
+        Hidden on admin routes — admin has its own layout.
       */}
-      {!isQuotationView && <Header />}
+      {!isQuotationView && !isAdminRoute && <Header />}
 
       <main className="flex-grow">
 
@@ -538,8 +540,8 @@ const AppContent: React.FC = () => {
 
       </main>
 
-      {!isQuotationView && <Footer />}
-      {!isQuotationView && <Chatbot />}
+      {!isQuotationView && !isAdminRoute && <Footer />}
+      {!isQuotationView && !isAdminRoute && <Chatbot />}
       <InstallPrompt />
 
       {/*

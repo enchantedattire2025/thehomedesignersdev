@@ -97,12 +97,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
     navigate('/');
   };
 
-  // Close sidebar
-  const closeSidebar = () => {
-    setDesktopSidebarOpen(false);
-    setMobileSidebarOpen(false);
-  };
-
   // Open or close sidebar based on screen size
   const toggleSidebar = () => {
     if (window.matchMedia('(min-width: 1024px)').matches) {
@@ -136,13 +130,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           </p>
         </div>
 
-        {/* Sidebar toggle remains fixed while navigation scrolls */}
+        {/* Sidebar toggle — fixed while navigation scrolls */}
         <button
           type="button"
-          onClick={closeSidebar}
+          onClick={toggleSidebar}
           className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-secondary-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-          aria-label="Close sidebar"
-          title="Close sidebar"
+          aria-label="Toggle sidebar"
+          title="Toggle sidebar"
         >
           <PanelLeft className="h-5 w-5" />
         </button>
@@ -256,15 +250,15 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         {/* Admin header */}
         <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:px-6">
 
-          {/* Toggle visible when sidebar is closed on desktop */}
+          {/* Toggle: visible on mobile always, on desktop only when sidebar is closed */}
           <button
             type="button"
             onClick={toggleSidebar}
             className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
               desktopSidebarOpen ? 'lg:hidden' : ''
             }`}
-            aria-label="Open sidebar"
-            title="Open sidebar"
+            aria-label="Toggle sidebar"
+            title="Toggle sidebar"
           >
             <PanelLeft className="h-5 w-5" />
           </button>
@@ -279,6 +273,11 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         <main className="min-h-0 min-w-0 flex-1">
           {children}
         </main>
+
+        {/* Admin footer — follows content horizontal positioning */}
+        <footer className="shrink-0 border-t border-gray-200 bg-white px-4 py-4 text-center text-xs text-gray-400 lg:px-6">
+          &copy; {new Date().getFullYear()} TheHomeDesigners.in — Admin Console
+        </footer>
 
       </div>
     </div>
