@@ -15,8 +15,7 @@ import {
   Settings,
   Plug,
   ScrollText,
-  Menu,
-  X,
+  PanelLeft,
   LogOut,
   ChevronRight,
 } from 'lucide-react';
@@ -84,7 +83,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Highlight the active navigation item
+  // Check active navigation item
   const isActive = (path: string) => {
     if (path === '/admin') {
       return location.pathname === '/admin';
@@ -99,7 +98,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
     navigate('/');
   };
 
-  // Toggle sidebar depending on screen size
+  // Toggle sidebar for desktop and mobile
   const toggleSidebar = () => {
     if (window.innerWidth >= 1024) {
       setDesktopSidebarOpen((d) => !d);
@@ -108,6 +107,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Close mobile sidebar after navigation
   const closeMobileSidebar = () => {
     setMobileSidebarOpen(false);
   };
@@ -118,6 +118,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
 
       {/* Sidebar header */}
       <div className="flex shrink-0 items-center gap-2 border-b border-secondary-700/50 px-3 py-4">
+
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500">
           <LayoutDashboard className="h-5 w-5 text-white" />
         </div>
@@ -131,16 +132,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           </p>
         </div>
 
-        {/* Close mobile sidebar */}
-        <button
-          type="button"
-          onClick={closeMobileSidebar}
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-secondary-800 hover:text-white lg:hidden"
-          aria-label="Close sidebar"
-          title="Close sidebar"
-        >
-          <X className="h-5 w-5" />
-        </button>
       </div>
 
       {/* Scrollable navigation */}
@@ -149,13 +140,16 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
       >
         <div className="space-y-5">
+
           {NAV_SECTIONS.map((section) => (
             <div key={section.title}>
+
               <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
                 {section.title}
               </p>
 
               <div className="space-y-0.5">
+
                 {section.items.map((item) => {
                   const active = isActive(item.path);
                   const Icon = item.icon;
@@ -190,6 +184,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
                     </button>
                   );
                 })}
+
               </div>
             </div>
           ))}
@@ -205,8 +200,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
               <span>Sign Out</span>
             </button>
           </div>
+
         </div>
       </nav>
+
     </div>
   );
 
@@ -236,7 +233,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         </>
       )}
 
-      {/* Main dashboard content */}
+      {/* Main dashboard */}
       <div
         className={`flex min-h-dvh min-w-0 flex-1 flex-col transition-[margin] duration-300 ease-in-out ${
           desktopSidebarOpen ? 'lg:ml-60' : 'lg:ml-0'
@@ -246,7 +243,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         {/* Admin header with sidebar toggle */}
         <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:px-6">
 
-          {/* One toggle button for opening and closing sidebar */}
+          {/* Same sidebar icon for open and close */}
           <button
             type="button"
             onClick={toggleSidebar}
@@ -263,16 +260,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
                 : 'Open sidebar'
             }
           >
-            {desktopSidebarOpen || mobileSidebarOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            <PanelLeft className="h-5 w-5" />
           </button>
 
           <span className="font-semibold text-gray-800">
             Admin Console
           </span>
+
         </header>
 
         {/* Dashboard page content */}
@@ -281,6 +275,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         </main>
 
       </div>
+
     </div>
   );
 };
