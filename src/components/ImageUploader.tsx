@@ -59,7 +59,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
-        .from('project-images')
+        .from('ai-floor-plans')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
