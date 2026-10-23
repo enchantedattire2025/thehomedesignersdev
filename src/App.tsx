@@ -5,7 +5,7 @@ import {
   Routes,
   Route,
   useNavigate,
-  useLocationh
+  useLocation
 } from 'react-router-dom';
 
 import { AuthProvider } from './hooks/AuthContext';
