@@ -459,18 +459,32 @@ const CustomerRegistration = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Project Area (sq ft)
-                    </label>
-                    <input
-                      type="text"
-                      name="project_area"
-                      value={formData.project_area}
-                      onChange={handleInputChange}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="e.g., 1200 sq ft"
-                    />
-                  </div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Project Area (sq ft)
+                      </label>
+                    
+                      <input
+                        type="number"
+                        name="project_area"
+                        value={formData.project_area}
+                        onChange={handleInputChange}
+                        min="1"
+                        step="1"
+                        onKeyDown={(e) => {
+                          if (["-", "+", "e", "E", "."].includes(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        onPaste={(e) => {
+                          const pastedText = e.clipboardData.getData("text");
+                          if (!/^\d+$/.test(pastedText)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="e.g., 1200 sq ft"
+                      />
+                    </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
