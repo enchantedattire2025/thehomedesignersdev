@@ -129,25 +129,22 @@ const CustomerRegistration = () => {
     };
   }, [user, authLoading, navigate]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
 
-    // Validate phone number: only digits, max 10 digits
-    if (name === 'phone') {
-      const digitsOnly = value.replace(/\D/g, '');
-      const truncated = digitsOnly.slice(0, 10);
-      setFormData(prev => ({
-        ...prev,
-        [name]: truncated
-      }));
-      return;
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+    
+      // Prevent invalid project area values
+      if (name === "project_area" && value !== "") {
+        if (!/^\d+$/.test(value) || Number(value) <= 0) {
+          return;
+        }
+      }
+    
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    };
 
   const handleArrayChange = (field: 'inspiration_links' | 'room_types', index: number, value: string) => {
     setFormData(prev => ({
