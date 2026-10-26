@@ -4,6 +4,27 @@ import { Star, MapPin, Filter, Search, Building2, Wifi } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Designer } from '../lib/supabase';
 
+const designerFallbackImages = [
+  'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400',
+  'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=400',
+  'https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=400',
+  'https://images.pexels.com/photos/1669799/pexels-photo-1669799.jpeg?auto=compress&cs=tinysrgb&w=400',
+  'https://images.pexels.com/photos/1743229/pexels-photo-1743229.jpeg?auto=compress&cs=tinysrgb&w=400',
+  'https://images.pexels.com/photos/2029667/pexels-photo-2029667.jpeg?auto=compress&cs=tinysrgb&w=400',
+];
+
+const getDesignerFallbackImage = (designerId: string) => {
+  let hash = 0;
+
+  for (let i = 0; i < designerId.length; i++) {
+    hash = (hash * 31 + designerId.charCodeAt(i)) | 0;
+  }
+
+  return designerFallbackImages[
+    Math.abs(hash) % designerFallbackImages.length
+  ];
+};
+
 const Designers = () => {
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
@@ -230,10 +251,20 @@ const Designers = () => {
                   <div key={designer.id} className="card overflow-hidden flex flex-col">
                     <div className="flex flex-1">
                       <div className="w-1/3 flex-shrink-0">
-                        <img
-                          src={designer.profile_image || 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400'}
+                       <img
+                          src={designer.profile_image || getDesignerFallbackImage(designer.id)}
                           alt={`${designer.name}'s profile`}
                           className="w-full h-full object-cover min-h-[200px]"
+                          loading="lazy"
+                          onError={(e) => {
+                            const fallback = getDesignerFallbackImage(designer.id);
+                        
+                            if (e.currentTarget.src !== fallback) {
+                              e.currentTarget.src = fallback;
+                            } else {
+                              e.currentTarget.onerror = null;
+                            }
+                          }}
                         />
                       </div>
                       <div className="w-2/3 p-4 flex flex-col">
