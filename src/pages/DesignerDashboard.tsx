@@ -46,6 +46,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useDesignerProfile } from '../hooks/useDesignerProfile';
 import { supabase } from '../lib/supabase';
 import SubscriptionBanner from '../components/SubscriptionBanner';
+import DesignerCommunityPanel from '../components/community/DesignerCommunityPanel';
 
 interface DashboardStats {
   totalProjects: number;
@@ -1065,6 +1066,10 @@ const DesignerDashboard = () => {
               )}
             </div>
           </div>
+        </div>
+
+        <div className="mb-8">
+          <DesignerCommunityPanel />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
