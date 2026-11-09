@@ -1,10 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const FALLBACK_SUPABASE_URL = 'https://zxttalysbycssowlhynq.supabase.co';
-const FALLBACK_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dHRhbHlzYnljc3Nvd2xoeW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MTA1ODcsImV4cCI6MjA5OTE4NjU4N30.cJnMXi_UYoyYoADd-BO_hTd_rZxf6WWiYAbFOB4Upm4';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || FALLBACK_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 const isValidUrl = (url: string) => {
   if (!url) return false;
